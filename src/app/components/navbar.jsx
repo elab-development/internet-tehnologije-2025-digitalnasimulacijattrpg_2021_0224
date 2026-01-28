@@ -9,7 +9,7 @@ export function NavBar() {
                 }/>
                 <div className="flex flex-row justify-between gap-2">
                     <NavbarLink link="/" tekst="welcome"/>
-                    <NavbarLink link="" tekst="about"/>
+                    <NavbarLink link="/about/" tekst="about"/>
                 </div>
             </div>
             <div className="flex flex-row gap-2">
