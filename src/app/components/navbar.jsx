@@ -13,9 +13,9 @@ export function NavBar() {
                 </div>
             </div>
             <div className="flex flex-row gap-2">
-                <NavbarLink link="" tekst="log in"/>
+                <NavbarLink link="/log-in/" tekst="log in"/>
                 <p>/</p>
-                <NavbarLink link="" tekst="sign up"/>
+                <NavbarLink link="/sign-up/" tekst="sign up"/>
             </div>
         </div>
     );
