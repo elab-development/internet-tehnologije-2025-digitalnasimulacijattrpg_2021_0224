@@ -1,1 +1,4 @@
 sudo docker run --name ttrpg-simulator -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ttrpgs -p 5432:5432 -v ttrpgs_db:/var/lib/postgresql/data -d postgres:17
+
+// Za Windows: 
+docker run -d --name ttrpg-simulator -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ttrpgs -p 5432:5432 -v ttrpgs_db:/var/lib/postgresql/data postgres:17
