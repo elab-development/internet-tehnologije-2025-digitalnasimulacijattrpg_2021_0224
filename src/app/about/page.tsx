@@ -1,9 +1,11 @@
+import Kockice from "../components/kockice"
+
 export default function About() {
     return (
-        <div>
+        <div className="flex flex-col items-center">
             <h1>O aplikaciji</h1>
             <p>neki opis i tako to</p>
-            <p>*bacanje kockica*</p>
+            <Kockice />
             <p>autori</p>
         </div>
     );
