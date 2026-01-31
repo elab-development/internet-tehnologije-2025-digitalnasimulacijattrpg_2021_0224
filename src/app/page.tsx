@@ -1,9 +1,11 @@
+import Kockice from "./components/kockice";
+
 export default function Welcome() {
     return (
-        <div>
+        <div className="flex flex-col items-center">
             <h1>Stranica koju vide neulogovani korisnici</h1>
             <p>*lorem ipsum*</p>
-            <p>*bacanje kockica*</p>
+            <Kockice />
         </div>
     );
 }
