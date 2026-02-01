@@ -1,24 +1,39 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import Link from 'next/link';
+import { SubmitEvent, useState } from 'react';
 
+
+type Body = {
+    username: string;
+    password: string;
+    confirmPassword: string;
+}
 
 export default function SignUpPage(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    function handleSubmit(e) {
-        e.preventDefault
+    const handleSubmit = async (e: SubmitEvent) => {
+        e.preventDefault();
 
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        
+    const res = await fetch('/api/sign-up/', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password, confirmPassword })
+    });
 
-        }
-    }  
+    if (res.ok) {
+        window.location.href = '/log-in/';
+    } else {
+        const data = await res.json();
+        alert(`Error: ${data.error}`);
+    }
+}
+
 return (
     <div className="min-h-screen flex items-center justify-center">
         <form 
@@ -50,12 +65,10 @@ return (
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
         />
-        <button type="submit" className="w-full bg-black-500 border text-white py-2 hover:bg-pink-600">
+        <button type="submit" className="w-full bg-black border text-white py-2 hover:bg-pink-600">
             Create account
         </button>
     </form>
 </div>
 );
-        }
-
-
+}
