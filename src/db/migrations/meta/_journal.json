@@ -8,6 +8,41 @@
       "when": 1769714788047,
       "tag": "0000_glossy_dormammu",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769965479770,
+      "tag": "0001_right_jack_murdock",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769965554050,
+      "tag": "0002_goofy_killmonger",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1769966911959,
+      "tag": "0003_futuristic_starhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1769967838881,
+      "tag": "0004_regular_santa_claus",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1769969560470,
+      "tag": "0005_harsh_joshua_kane",
+      "breakpoints": true
     }
   ]
 }

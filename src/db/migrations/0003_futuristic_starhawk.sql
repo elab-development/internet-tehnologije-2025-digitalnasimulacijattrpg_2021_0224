@@ -1,0 +1,1 @@
+ALTER TABLE "Campaign" ADD COLUMN "dateStart" timestamp DEFAULT now();
