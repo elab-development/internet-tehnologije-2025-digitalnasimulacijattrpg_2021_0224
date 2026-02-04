@@ -1,0 +1,1 @@
+ALTER TABLE "Campaign" ALTER COLUMN "description" SET NOT NULL;
