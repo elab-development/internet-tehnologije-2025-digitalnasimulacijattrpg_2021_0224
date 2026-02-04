@@ -2,3 +2,4 @@ DATABASE_URL=postgres://user:password@localhost:5432/ttrpgs
 API_URL=https://localhost:3000
 JWT_SECRET=tajna
 JWT_EXPIRES=1011d
+MAGICNIBROJ=magija

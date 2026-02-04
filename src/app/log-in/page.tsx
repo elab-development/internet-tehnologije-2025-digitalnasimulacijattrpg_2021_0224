@@ -1,17 +1,31 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import Link from 'next/link';
+import { SubmitEvent, useState } from 'react';
 
 
-export default function SignUpPage(){
+export default function LogIn(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    function handleSubmit(e) {
-        e.preventDefault
 
+    const handleSubmit = async (e: SubmitEvent) => {
+        e.preventDefault();
+
+    const res = await fetch('/api/log-in/', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    });
+
+    if (res.ok) {
+        window.location.href = '/'; 
+    } else {
+        alert("Failed to log in");
     }
+}
 return (
     <div className="min-h-screen flex items-center justify-center">
         <form 
@@ -24,7 +38,6 @@ return (
             placeholder="Username"
             className="w-full border px-3  py-2 "
             onChange={(e) => setUsername(e.target.value)}
-
             required
         /> 
         <input
@@ -35,10 +48,11 @@ return (
             value={password}
             required
         />
-        <button type="submit" className="w-full bg-black-500 border text-white py-2 hover:bg-pink-600">
+        <button type="submit" className="w-full bg-black border text-white py-2 hover:bg-pink-600">
             Log in now
         </button>
     </form>
 </div>
 );
+
 }
