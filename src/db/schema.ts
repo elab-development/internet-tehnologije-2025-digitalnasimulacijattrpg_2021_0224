@@ -28,6 +28,7 @@ export const campaignDocumentsTable =pgTable("campaignDocuments", {
 
 export const documentsTable = pgTable("Document", {
   id: uuid().primaryKey().defaultRandom(),
+  name: varchar({ length: 255 }).notNull(),
   type: filetypeEnum().notNull(),
   filepath: varchar({ length: 255 }).notNull(),
 })
