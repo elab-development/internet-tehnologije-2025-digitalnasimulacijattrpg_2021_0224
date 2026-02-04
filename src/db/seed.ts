@@ -15,11 +15,11 @@ await db.transaction(async (tx) => {
         },
         {
             username: "ignjat",
-            password: rs,
+            password: os,
         },
         {
             username: "horrorrosic",
-            password: os,
+            password: rs,
         }
     ]);
 });
