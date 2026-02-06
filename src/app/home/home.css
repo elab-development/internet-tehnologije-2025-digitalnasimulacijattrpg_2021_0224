@@ -1,0 +1,59 @@
+
+.glavni {
+  height:100vh;
+  width:100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+.glavni-layout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 100px;
+  justify-content: center;
+}
+
+.stvarcine{
+  width: 100%;
+}
+
+.stvari {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stvari-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.btn {
+  background-color:#ff6550;
+  margin-top: 16px;
+  width: 100%;      
+  padding: 8px 16px;
+  cursor: pointer;
+  border: 26px outset #ff6550;
+  font-size: 1.75rem;
+}
+.btn:hover{
+    cursor: pointer;
+}
+
+.naslov {
+  font-size: 3.25rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.komentar {
+  font-size: 1rem;
+  font-size: 2.25rem;
+}
