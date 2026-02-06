@@ -54,7 +54,7 @@ export function NavBar() {
             {isPopupShown &&
             <div className="flex flex-col absolute right-1 top-1 bg-black border p-1 pt-0">
                 <button className="text-right hover:text-pink-500 active:text-transparent" onClick={togglePopupShown}> x </button>
-                <button className="border flex hover:text-pink-500 p-1 whitespace-nowrap active:text-transparent" onClick={onLogout} > log out </button>
+                <button className="border flex hover:text-pink-500 p-1 whitespace-nowrap active:text-transparent" onClick={onLogout} > <a href="/"> log out </a> </button>
             </div>
             }
         </div>
