@@ -61,7 +61,7 @@ export function NavBar() {
     );
 }
 
-function NavbarLink(props) {
+function NavbarLink(props : any) {
     return (
         <a href={props.link} className="hover:text-pink-500 active:text-transparent">{props.tekst}</a>
     );
