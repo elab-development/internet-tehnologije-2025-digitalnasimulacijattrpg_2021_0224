@@ -24,3 +24,24 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form input,
+form textarea,
+form select {
+  border: 1px solid;
+  padding: 0 5 0 5;
+  width: 100%;
+  margin-top: 0%;
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+  border-color: #f6339a;
+  outline: none;
+}
