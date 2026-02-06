@@ -16,18 +16,19 @@ export function signAuthToken(claims: JwtUserClaims): string {
     return jwt.sign(claims, JWT_SECRET, { algorithm: 'HS256', expiresIn: '7d' })
 }
 
-export function vertifyAuthToken(token: string){
-    const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload & JwtUserClaims
+export function vertifyAuthToken(token: string) {
+    const payload = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload & JwtUserClaims;
 
-    if (!payload || !payload.sub){
+    if (!payload || !payload.userID) {
         throw new Error('Invalid token');
     }
 
     return {
-        sub: payload.sub,
-        name: payload.name
+        sub: payload.userID,
+        username: payload.username
     }
 }
+
 
 export function cookieOptions(){
     return {

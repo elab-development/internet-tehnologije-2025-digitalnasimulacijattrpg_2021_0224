@@ -35,6 +35,7 @@ export const documentsTable = pgTable("Document", {
 
 export const charSheetsTable = pgTable("CharSheet", {
   id: uuid().primaryKey().defaultRandom(),
+  name: varchar({ length: 255 }).notNull(),
   str: integer().notNull(),
   dex: integer().notNull(),
   will: integer().notNull(),
