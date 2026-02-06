@@ -2,13 +2,12 @@
 
 import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-export type User = { id: string; name: string; email: string; createdAt: string }
+import { user } from "../types";
 
 //tip za stanje (podatke) koje zelimo da delimo
 type AuthState = { status: "loading"; user: null }
     | { status: "unauthenticated"; user: null }
-    | { status: "authenticated"; user: User };
+    | { status: "authenticated"; user: user };
 
 //Context Shape - tip podatka koji prosledjujemo React Context hook-u
 // sadrzi stanje plus funkcije AuthProvider-a
