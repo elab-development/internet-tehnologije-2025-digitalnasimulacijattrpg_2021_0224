@@ -48,7 +48,7 @@ return (
             value={password}
             required
         />
-        <button type="submit" className="w-full bg-black border text-white py-2 hover:bg-pink-600">
+        <button type="submit" className="w-full bg-black border text-white py-2 hover:bg-pink-500">
             Log in now
         </button>
     </form>
