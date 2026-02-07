@@ -41,7 +41,7 @@ export const charSheetsTable = pgTable("CharSheet", {
   will: integer().notNull(),
   armor: integer().notNull(),
   hp: integer().notNull(),
-  currency: numeric().notNull(),
+  currency: integer().notNull(),
   owner: uuid().notNull().references(() => usersTable.id),
 })
 
