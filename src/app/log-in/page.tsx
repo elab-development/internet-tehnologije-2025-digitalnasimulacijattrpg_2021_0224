@@ -21,7 +21,7 @@ export default function LogIn(){
     });
 
     if (res.ok) {
-        window.location.href = '/'; 
+        window.location.href = '/home'; 
     } else {
         alert("Failed to log in");
     }
