@@ -18,7 +18,7 @@ export function NavBar() {
     }
 
     return (
-        <div className="flex flex-row items-center justify-between border gap-2 pr-2 pl-2 font-bold">
+        <div className="flex flex-row items-center justify-between border gap-2 pr-2 pl-2 font-bold sticky top-0 bg-black">
             <div className="flex flex-row justify-between gap-2">
                 <NavbarLink link="/" tekst={
                     <Logo />
