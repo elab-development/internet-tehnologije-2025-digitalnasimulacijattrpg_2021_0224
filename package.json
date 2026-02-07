@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.ts",
     "build": "next build",
-    "start": "next start",
+    "start" : "NODE_ENV=production node server.ts",
     "lint": "eslint",
     "db:migrate": "npx drizzle-kit generate && npx drizzle-kit push",
     "db:seed": "tsx src/db/seed.ts"
@@ -19,6 +19,8 @@
     "pg": "^8.17.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "tsx": "^4.21.0"
   },
   "devDependencies": {
