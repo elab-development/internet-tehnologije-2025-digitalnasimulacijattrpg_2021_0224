@@ -9,6 +9,7 @@ export default function Kockice() {
         return Math.floor(Math.random()*6 + 1)
     } 
 
+
     const [value, setValue] = useState(rand());
     const [value2, setValue2] = useState(rand());
 
@@ -16,8 +17,11 @@ export default function Kockice() {
 
     return (
         <div className="flex flex-col items-center m-1">
-            {diceRolled && // mrzim ovu sintaksu svim svojim bicem
-                <div className="kockice flex flex-row">
+            <div style={{height:"64px"}}>
+                {diceRolled && // mrzim ovu sintaksu svim svojim bicem
+                <div className="kockice flex flex-row" style={{visibility: diceRolled ? "visible" : "hidden", 
+                    pointerEvents: diceRolled ? "auto" : "none"
+                }}>
                     <Kockica val={value}/>
                     <Kockica val={value2}/>
                     {
@@ -25,6 +29,7 @@ export default function Kockice() {
                     }
                 </div>
             }
+            </div>
             <button className="border p-1 hover:text-pink-500 active:text-transparent" onClick={()=>{
                 setDiceRolled(true);
                 setValue(rand())
