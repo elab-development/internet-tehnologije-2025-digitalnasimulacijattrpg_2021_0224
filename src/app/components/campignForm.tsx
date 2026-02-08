@@ -1,11 +1,11 @@
 import { campaign } from "../types"
 
 interface campaignProps {
-    campaign : campaign | null
+    campaign : campaign | undefined
 }
 
 export default function CampignForm({ campaign } : campaignProps) {
-    const disabled = (campaign != null)
+    const disabled = (campaign != undefined)
     return (
         <form className="flex flex-col m-2 w-1/3 items-center">
             <input

@@ -1,34 +1,93 @@
 'use client'
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
 import Container from '../components/Container'
-import { stdout } from 'process';
 import './home.css'
+import { campaign } from '../types';
+import { charSheet } from '../types';
+import { UUID } from 'crypto';
+import { useAuth } from "../components/AuthProvider";
+import charSheetForm from "../components/charSheetForm";
+import CampignForm from '../components/campignForm';
+import CharSheetForm from '../components/charSheetForm';
+
 
 interface ContainerData{
-    id:number;
+    id:UUID;
     name:string;
     onClick:()=>void;
 }
+
+
+
+
 function Home(){
 
+    async function fetchCampaigns(userId: string): Promise<campaign[]> {
+         const res = await fetch(`/api/campaginS?userId=${userId}`, {
+        credentials: "include",
+        });
+        console.log(res,"ovo je res");
 
-    //Rosicu seti se da zapravo treba da napravis metodu koja prima listu karaktera i kampanja koje je frajer napravio i da napravis taj tip podataka i njega koristis u useState
+        if (!res.ok) {
+            console.log("ne radi u pitanju res.ok",res.status);
+            throw new Error("Fetch failed");
+        }
 
-    //test deo
-    const listaKampaja:ContainerData[]=[{id:1,name:"HRASTOSTITOVE LUDORIJE", onClick:handleCampainOnClick},{id:2,name:"drugi", onClick:handleCampainOnClick},{id:3,name:"treci", onClick:handleCampainOnClick}];
+        return res.json();
+    }
+    async function fetchCharacterSheets(userId:string):Promise<charSheet[]>{
+        const res=await fetch(`/api/charSheets?userId=${userId}`,{ credentials:"include"});
+        console.log(res,"ovo je res za ch");
+        if(!res.ok){
+            console.log("res nije ok kod cs");
+            throw new Error("Fetch failed cs");
+        }
+        return res.json();
+    }
+    const {status, user, logout} = useAuth()//kfndklfnsfklnds
+     console.log(user,"ovo je user");
 
-    const [csList,setCsList]=useState<ContainerData[]>(listaKampaja);//izvlaci iz baze ovo je trenutno resenje da se svaki put louduje prazna
-    const [campainList,setCampainList]=useState<ContainerData[]>(listaKampaja);//trenutno testiram sa hardkodovanim listama
+
+    const [csList,setCsList]=useState<charSheet[]>([]);
+    const [campainList,setCampainList]=useState<campaign[]>([]);
    
 
-    //nisam siguran da umem da odradim div levo koji iskoci kada kliknem na lika ili kampanju, takodje baza zajebancija
-    function handleCampainOnClick(){
+useEffect(() => {
+  if (status === "authenticated" && user?.id) {
+    fetchCampaigns(user.id)
+      .then(data => {
+        console.log("STIGLO:", data);
+        setCampainList(data);
+      })
+      .catch(err => {
+        console.error("FETCH ERROR:", err);
+      });
+
+      fetchCharacterSheets(user.id)
+      .then(sheets=>{
+        console.log("stigli sheets:",sheets);
+        setCsList(sheets);
+      })
+    }
+    }, [status, user?.id]);
+
+    const[toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
+    const[toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
+   
+
+    let kam:UUID;
+    let charsheet:UUID;
+    function handleCampainOnClick(id:UUID){
         console.log("kliknuto dugme");
         //radi popup za sammu kampanju koja prikazuje postojecu kampanju
+        setToggleCampaginForm(true);
+        kam=id;
     }
-    function handleCsOnClick(){
+    function handleCsOnClick(id:UUID){
         console.log("kliknuto dugme za cs");
         //radi popup za samu kampanju koja prikazuje postojeceg karaktera
+        setToggleCharSheetForm(true);
+        charsheet=id;
     }
     function handleAddCs(){
         //prikazuje popup, kupi podatke od popupa i sastavlja stvari u listu
@@ -38,9 +97,6 @@ function Home(){
     }
     
     return (
-
-        
-
         <>
         <div className='glavni'>
             <div className='glavni-layout'>
@@ -52,7 +108,7 @@ function Home(){
                     {campainList.length===0 ? 
                     (<p className='komentar'>Nema aktivnih kamanja</p>) : 
                     campainList.map((campain)=>(
-                    <Container key={campain.id} id={campain.id} name={campain.name} onClick={handleCampainOnClick} />
+                    <Container key={campain.id} id={campain.id} name={campain.name} onClick={()=>{handleCampainOnClick(campain.id)}} />
                     ))
                     }
                     
@@ -66,7 +122,7 @@ function Home(){
                     
                     {csList.length===0 ? (<p className='komentar'>Nema karaktera</p>) :
                     csList.map((container)=>(
-                        <Container key={container.id} id={container.id} name={container.name} onClick={handleCsOnClick}></Container>
+                        <Container key={container.id} id={container.id} name={container.name} onClick={()=>{handleCsOnClick(container.id)}}></Container>
                     ))
                     }
                     
@@ -74,7 +130,18 @@ function Home(){
                 <button className='btn' onClick={handleAddCs}>Kreiraj NOVOG lika</button>
             </div>
             </div>
+                   {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-black border-1'>
+            <button onClick={()=>{setToggleCampaginForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
+            <CampignForm campaign={campainList.find(cm=>cm.id===kam)}></CampignForm>
+            
+
+        </div>):(<div></div>)}
+        {toggleCharSheetForm ? (<div className='popupSheet absolute left-20 up-50 bg-black border-1'>
+            <button onClick={()=>{setToggleCharSheetForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
+            <CharSheetForm char={csList.find(cs=>cs.id===charsheet)}></CharSheetForm>
+        </div>):(<div></div>)}
         </div>
+ 
         </>
     );
 }

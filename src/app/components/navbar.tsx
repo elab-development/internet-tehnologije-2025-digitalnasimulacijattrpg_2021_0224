@@ -7,6 +7,7 @@ import Image from "next/image";
 export function NavBar() {
 
     const {status, user, logout} = useAuth()
+    console.log("navbar user: " + user?.username);
  
     const [isPopupShown, setIsPopupShown] = useState(false);
     const togglePopupShown = () => {
