@@ -64,6 +64,13 @@
       "when": 1770391420779,
       "tag": "0008_dark_yellowjacket",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1770500403800,
+      "tag": "0009_sloppy_eternals",
+      "breakpoints": true
     }
   ]
 }

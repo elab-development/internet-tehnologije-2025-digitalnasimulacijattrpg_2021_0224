@@ -11,7 +11,7 @@ export const usersTable = pgTable("User", {
 export const campaignsTable = pgTable("Campaign", {
   id: uuid().primaryKey().defaultRandom(),
   name: varchar({ length: 255 }).notNull(),
-  description: varchar({ length: 255 }).notNull(),
+  description: varchar({ length: 1000 }).notNull(),
   dateStart: timestamp().defaultNow(),
   gameMaster: uuid().notNull().references(() => usersTable.id),
 });
