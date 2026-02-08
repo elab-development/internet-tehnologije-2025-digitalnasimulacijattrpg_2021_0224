@@ -1,24 +1,61 @@
 'use client'
 import {useState} from 'react'
 import Container from '../components/Container'
-import { stdout } from 'process';
 import './home.css'
+import {db} from "@/db";
+import {usersTable } from '@/db/schema';//vrlo verovatno mi ne treba
+import { campaignsTable } from '@/db/schema'; 
+import { charSheetsTable } from '@/db/schema';
+import { campaign } from '../types';
+import { charSheet } from '../types';
+import { UUID } from 'crypto';
+import { useAuth } from "../components/AuthProvider";
+import { eq } from 'drizzle-orm';
+
+
 
 interface ContainerData{
-    id:number;
+    id:UUID;
     name:string;
     onClick:()=>void;
 }
+    const {status, user, logout} = useAuth()
+    if(!user?.id){
+        throw new Error("nema usera");
+    }
+
+const rowcs:any[]=await db.select().from(charSheetsTable).where(eq(charSheetsTable.owner, user.id));
+const rowcam:any[]=await db.select().from(campaignsTable).where(eq(campaignsTable.gameMaster,user.id));
+// rowcam.push(db.select().from()) treba da pokupi campanje u kojima je lik igrac
 function Home(){
 
 
-    //Rosicu seti se da zapravo treba da napravis metodu koja prima listu karaktera i kampanja koje je frajer napravio i da napravis taj tip podataka i njega koristis u useState
-
-    //test deo
-    const listaKampaja:ContainerData[]=[{id:1,name:"HRASTOSTITOVE LUDORIJE", onClick:handleCampainOnClick},{id:2,name:"drugi", onClick:handleCampainOnClick},{id:3,name:"treci", onClick:handleCampainOnClick}];
-
-    const [csList,setCsList]=useState<ContainerData[]>(listaKampaja);//izvlaci iz baze ovo je trenutno resenje da se svaki put louduje prazna
-    const [campainList,setCampainList]=useState<ContainerData[]>(listaKampaja);//trenutno testiram sa hardkodovanim listama
+    const listaKampanja:campaign[]=rowcam.map(row=>{
+     return{   
+        id : row.id,
+        name : row.name,
+        description : row.description,
+        dateStart : row.dateStart,
+        gameMaster : row.gameMaster,
+        }
+    }
+    )
+    const listaKaraktera:charSheet[]=rowcs.map(row=>{
+        return{
+                id : row.id,
+                name : row.name,
+                str : row.str,
+                dex : row.dex,
+                will : row.will,
+                armor : row.armor,
+                hp : row.hp,
+                currency : row.currency,
+                owner : row.owner, 
+        }
+    })
+    
+    const [csList,setCsList]=useState<charSheet[]>(listaKaraktera);
+    const [campainList,setCampainList]=useState<campaign[]>(listaKampanja);
    
 
     //nisam siguran da umem da odradim div levo koji iskoci kada kliknem na lika ili kampanju, takodje baza zajebancija
