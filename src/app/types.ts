@@ -16,7 +16,7 @@ export type campaign = {
     name : string,
     description : string,
     dateStart : Date,
-    gameMaster : user | null, // privremeno nullable
+    gameMaster : user, 
 }
 
 export type document = {
@@ -35,7 +35,7 @@ export type charSheet = {
     armor : number,
     hp : number,
     currency : number,
-    owner : user | null, // privremeno nullable
+    owner : user , 
 }
 
 export type note = {
