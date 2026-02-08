@@ -1,5 +1,8 @@
+'use client'
+
 import CampignForm from "../components/campignForm"
 import CharSheetForm from "../components/charSheetForm"
+import { socket } from "../socket"
 import { campaign, charSheet } from "../types"
 
 export default function Test() {
@@ -21,10 +24,21 @@ export default function Test() {
         dateStart : new Date,
         gameMaster : null,
     }
+    const onClick = () => {
+        socket.emit("joinCampaign", "Campaign 1")
+    }
+    const onClick2 = () => {
+        socket.emit("joinCampaign", "Campaign 2")
+    }
+    socket.on("pisi", (msg) => {
+        console.log(msg)
+    })
     return (
         <div className="flex flex-row justify-center">
             <CampignForm campaign={testCampaign}/>
             <CharSheetForm char={test}/>
+            <button className="hover:text-pink-500 border active:text-transparent" onClick={onClick}>Join Campaign 1</button>
+            <button className="hover:text-pink-500 border active:text-transparent" onClick={onClick2}>Join Campaign 2</button>
         </div>
     )
 }
