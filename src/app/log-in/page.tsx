@@ -37,6 +37,7 @@ return (
             type="text"
             placeholder="Username"
             className="w-full border px-3  py-2 "
+            autoFocus
             onChange={(e) => setUsername(e.target.value)}
             required
         /> 
