@@ -1,29 +1,35 @@
 import {db} from "@/db";
 import {usersTable, charSheetsTable,campaignsTable,campaignPlayersTable } from '@/db/schema';
 import { eq } from "drizzle-orm";
-// import { NextResponse } from 'next/server';
-import bcrypt from "bcrypt";
-import {AUTH_COOKIE, cookieOptions, signAuthToken} from "@/lib/auth"; 
+import { NextResponse } from 'next/server';
+// import bcrypt from "bcrypt";
+// import {AUTH_COOKIE, cookieOptions, signAuthToken} from "@/lib/auth"; 
 // const MAGICNIBROJ = parseInt(process.env.MAGICNIBROJ!);
-import { campaign,charSheet } from "@/app/types";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { UUID } from "crypto";
+import { campaign} from "@/app/types";
+// import type { NextApiRequest, NextApiResponse } from "next";
+// import { UUID } from "crypto";
 
 
 
-export async function GET(req:NextApiRequest, res: NextApiResponse<campaign[] | {error:string}>) {
+export async function GET(req:Request) {
     if(req.method!=="GET"){
         console.log("NIJE TRAZEN GET ALO UPOMOC");
-        res.status(405).json({error:"Method not allowed"});
+        return NextResponse.json({error:"Method not allowed"},{status:405});
+        
     }
-
-    const userId=req.query.userId as UUID;
+    
+            const { searchParams } = new URL(req.url);
+             const userId = searchParams.get("userId");
+    
     if(!userId){
-        res.status(400).json({error:"No usserId was sent"});
+        console.log("nije nasao usera");
+        return NextResponse.json({error:"No usserId found"},{status:400});
     }
         try{
             const campsGM:any[]=await db.select().from(campaignsTable).where(eq(campaignsTable.gameMaster,userId));
+            console.log("ne radi prvi db.select");
             const campaigns:campaign[]=campsGM.map(row=>{
+           console.log("radi prvi map");
             return{   
                 id : row.id,
                 name : row.name,
@@ -33,19 +39,23 @@ export async function GET(req:NextApiRequest, res: NextApiResponse<campaign[] | 
            }
             })
             const campP:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersTable,eq(campaignPlayersTable.capmaign,campaignsTable.id)).where(eq(campaignPlayersTable.player,userId));
+           console.log("ne radi drugi sb.select");
+
             campaigns.push(...campP.map(row=>{
+           console.log("radi prvi map");
+
             return{   
-                id : row.id,
-                name : row.name,
-                description : row.description,
-                dateStart : row.dateStart,
-                gameMaster : row.gameMaster,
+                id : row.campaign.id,
+                name : row.campaign.name,
+                description : row.campaign.description,
+                dateStart : row.campaign.dateStart,
+                gameMaster : row.campaign.gameMaster,
            
             }}));
-            //resi join problem
-            res.status(200).json(campaigns);
+            console.log("linija pre res.status(200), nadam se da je ubacio sve u jednu listu");
+            return NextResponse.json(campaigns, { status: 200 });
         }catch(err){
             console.log("Problem s bazom pri prikupljanju kampanja");
-            res.status(500).json({error:"Problem s bazom"})
+            throw new Error("poslednji catch u route!!");
         }
 }

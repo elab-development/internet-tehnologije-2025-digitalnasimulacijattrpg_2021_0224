@@ -1,16 +1,11 @@
 'use client'
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
 import Container from '../components/Container'
 import './home.css'
-import {db} from "@/db";
-import {usersTable } from '@/db/schema';//vrlo verovatno mi ne treba
-import { campaignsTable } from '@/db/schema'; 
-import { charSheetsTable } from '@/db/schema';
 import { campaign } from '../types';
 import { charSheet } from '../types';
 import { UUID } from 'crypto';
 import { useAuth } from "../components/AuthProvider";
-import { eq } from 'drizzle-orm';
 
 
 
@@ -19,43 +14,63 @@ interface ContainerData{
     name:string;
     onClick:()=>void;
 }
-    const {status, user, logout} = useAuth()
-    if(!user?.id){
-        throw new Error("nema usera");
-    }
 
-const rowcs:any[]=await db.select().from(charSheetsTable).where(eq(charSheetsTable.owner, user.id));
-const rowcam:any[]=await db.select().from(campaignsTable).where(eq(campaignsTable.gameMaster,user.id));
-// rowcam.push(db.select().from()) treba da pokupi campanje u kojima je lik igrac
+
+let listaKampanja:campaign[]=[];
+let listaKaraktera:charSheet[]=[];
+
 function Home(){
+//     async function fetchCampaigns(userId:UUID) {
+//     try{
+//         const res=await fetch('/api/campaginS?userId=${userId}', { credentials: "include" } );
+//         if(!res.ok){
+//             throw new Error("fecovanje nije uspelo");
+//         }
+//         listaKampanja=await res.json();
+//         //eturn listaKampanja;
+//         setCampainList(listaKampanja);
+//         console.log(listaKampanja,"ovo je lista kampanja");
+//         // console.log(res.status);
+//     }catch(err){
+//         console.log("NIJE PROSAO TRY ",err);
+//     }
+// }
+    async function fetchCampaigns(userId: string): Promise<campaign[]> {
+         const res = await fetch(`/api/campaginS?userId=${userId}`, {
+        credentials: "include",
+        });
+        console.log(res,"ovo je res");
 
-
-    const listaKampanja:campaign[]=rowcam.map(row=>{
-     return{   
-        id : row.id,
-        name : row.name,
-        description : row.description,
-        dateStart : row.dateStart,
-        gameMaster : row.gameMaster,
+        if (!res.ok) {
+            console.log("ne radi u pitanju res.ok",res.status);
+            throw new Error("Fetch failed");
         }
+
+        return res.json();
     }
-    )
-    const listaKaraktera:charSheet[]=rowcs.map(row=>{
-        return{
-                id : row.id,
-                name : row.name,
-                str : row.str,
-                dex : row.dex,
-                will : row.will,
-                armor : row.armor,
-                hp : row.hp,
-                currency : row.currency,
-                owner : row.owner, 
-        }
-    })
-    
-    const [csList,setCsList]=useState<charSheet[]>(listaKaraktera);
-    const [campainList,setCampainList]=useState<campaign[]>(listaKampanja);
+
+    const {status, user, logout} = useAuth()//kfndklfnsfklnds
+     console.log(user,"ovo je user");
+
+
+    const [csList,setCsList]=useState<charSheet[]>([]);
+    const [campainList,setCampainList]=useState<campaign[]>([]);
+   
+
+useEffect(() => {
+  if (status === "authenticated" && user?.id) {
+    fetchCampaigns(user.id)
+      .then(data => {
+        console.log("STIGLO:", data);
+        setCampainList(data);
+      })
+      .catch(err => {
+        console.error("FETCH ERROR:", err);
+      });
+  }
+}, [status, user?.id]);
+
+
    
 
     //nisam siguran da umem da odradim div levo koji iskoci kada kliknem na lika ili kampanju, takodje baza zajebancija
