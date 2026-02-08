@@ -6,7 +6,8 @@ import { campaign } from '../types';
 import { charSheet } from '../types';
 import { UUID } from 'crypto';
 import { useAuth } from "../components/AuthProvider";
-
+import charSheetForm from "../components/charSheetForm";
+import CampignForm from '../components/campignForm';
 
 
 interface ContainerData{
@@ -16,25 +17,10 @@ interface ContainerData{
 }
 
 
-let listaKampanja:campaign[]=[];
-let listaKaraktera:charSheet[]=[];
+
 
 function Home(){
-//     async function fetchCampaigns(userId:UUID) {
-//     try{
-//         const res=await fetch('/api/campaginS?userId=${userId}', { credentials: "include" } );
-//         if(!res.ok){
-//             throw new Error("fecovanje nije uspelo");
-//         }
-//         listaKampanja=await res.json();
-//         //eturn listaKampanja;
-//         setCampainList(listaKampanja);
-//         console.log(listaKampanja,"ovo je lista kampanja");
-//         // console.log(res.status);
-//     }catch(err){
-//         console.log("NIJE PROSAO TRY ",err);
-//     }
-// }
+
     async function fetchCampaigns(userId: string): Promise<campaign[]> {
          const res = await fetch(`/api/campaginS?userId=${userId}`, {
         credentials: "include",
@@ -48,7 +34,15 @@ function Home(){
 
         return res.json();
     }
-
+    async function fetchCharacterSheets(userId:string):Promise<charSheet[]>{
+        const res=await fetch(`/api/charSheets?userId=${userId}`,{ credentials:"include"});
+        console.log(res,"ovo je res za ch");
+        if(!res.ok){
+            console.log("res nije ok kod cs");
+            throw new Error("Fetch failed cs");
+        }
+        return res.json();
+    }
     const {status, user, logout} = useAuth()//kfndklfnsfklnds
      console.log(user,"ovo je user");
 
@@ -67,6 +61,12 @@ useEffect(() => {
       .catch(err => {
         console.error("FETCH ERROR:", err);
       });
+
+      fetchCharacterSheets(user.id)
+      .then(sheets=>{
+        console.log("stigli sheets:",sheets);
+        setCsList(sheets);
+      })
   }
 }, [status, user?.id]);
 
