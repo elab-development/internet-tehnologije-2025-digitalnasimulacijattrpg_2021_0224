@@ -1,9 +1,10 @@
 'use client'
+import { UUID } from "crypto";
 
 interface ContainerProps {
   name: string;
   onClick: () => void;
-  id:number;
+  id:UUID;
 }
 
 function Container({ name, onClick }: ContainerProps) {
