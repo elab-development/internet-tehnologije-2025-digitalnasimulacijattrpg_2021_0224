@@ -3,14 +3,15 @@ import { UUID } from "crypto";
 
 interface ContainerProps {
   name: string;
-  onClick: () => void;
   id:UUID;
+  onClick: (id:UUID) => void;
+
 }
 
-function Container({ name, onClick }: ContainerProps) {
+function Container({ id,name, onClick }: ContainerProps) {
   return (
     <div
-      onClick={onClick}
+      onClick={()=>{onClick(id)}}
       className="
         cursor-pointer
          border-[31px] border-black bg-[#6d6d6d]

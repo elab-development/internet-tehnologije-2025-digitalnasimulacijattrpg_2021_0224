@@ -1,11 +1,11 @@
 import { charSheet } from "../types"
 
 interface charSheetProps {
-    char : charSheet | null
+    char : charSheet | undefined
 }
 
 export default function CharSheetForm({ char } : charSheetProps) {
-    const disabled = (char != null)
+    const disabled = (char != undefined)
     return (
         <form className="flex flex-col m-2 w-1/4 items-center">
             <input 

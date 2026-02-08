@@ -8,6 +8,7 @@ import { UUID } from 'crypto';
 import { useAuth } from "../components/AuthProvider";
 import charSheetForm from "../components/charSheetForm";
 import CampignForm from '../components/campignForm';
+import CharSheetForm from '../components/charSheetForm';
 
 
 interface ContainerData{
@@ -67,20 +68,26 @@ useEffect(() => {
         console.log("stigli sheets:",sheets);
         setCsList(sheets);
       })
-  }
-}, [status, user?.id]);
+    }
+    }, [status, user?.id]);
 
-
+    const[toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
+    const[toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
    
 
-    //nisam siguran da umem da odradim div levo koji iskoci kada kliknem na lika ili kampanju, takodje baza zajebancija
-    function handleCampainOnClick(){
+    let kam:UUID;
+    let charsheet:UUID;
+    function handleCampainOnClick(id:UUID){
         console.log("kliknuto dugme");
         //radi popup za sammu kampanju koja prikazuje postojecu kampanju
+        setToggleCampaginForm(true);
+        kam=id;
     }
-    function handleCsOnClick(){
+    function handleCsOnClick(id:UUID){
         console.log("kliknuto dugme za cs");
         //radi popup za samu kampanju koja prikazuje postojeceg karaktera
+        setToggleCharSheetForm(true);
+        charsheet=id;
     }
     function handleAddCs(){
         //prikazuje popup, kupi podatke od popupa i sastavlja stvari u listu
@@ -90,9 +97,6 @@ useEffect(() => {
     }
     
     return (
-
-        
-
         <>
         <div className='glavni'>
             <div className='glavni-layout'>
@@ -104,7 +108,7 @@ useEffect(() => {
                     {campainList.length===0 ? 
                     (<p className='komentar'>Nema aktivnih kamanja</p>) : 
                     campainList.map((campain)=>(
-                    <Container key={campain.id} id={campain.id} name={campain.name} onClick={handleCampainOnClick} />
+                    <Container key={campain.id} id={campain.id} name={campain.name} onClick={()=>{handleCampainOnClick(campain.id)}} />
                     ))
                     }
                     
@@ -118,7 +122,7 @@ useEffect(() => {
                     
                     {csList.length===0 ? (<p className='komentar'>Nema karaktera</p>) :
                     csList.map((container)=>(
-                        <Container key={container.id} id={container.id} name={container.name} onClick={handleCsOnClick}></Container>
+                        <Container key={container.id} id={container.id} name={container.name} onClick={()=>{handleCsOnClick(container.id)}}></Container>
                     ))
                     }
                     
@@ -126,7 +130,18 @@ useEffect(() => {
                 <button className='btn' onClick={handleAddCs}>Kreiraj NOVOG lika</button>
             </div>
             </div>
+                   {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-black border-1'>
+            <button onClick={()=>{setToggleCampaginForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
+            <CampignForm campaign={campainList.find(cm=>cm.id===kam)}></CampignForm>
+            
+
+        </div>):(<div></div>)}
+        {toggleCharSheetForm ? (<div className='popupSheet absolute left-20 up-50 bg-black border-1'>
+            <button onClick={()=>{setToggleCharSheetForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
+            <CharSheetForm char={csList.find(cs=>cs.id===charsheet)}></CharSheetForm>
+        </div>):(<div></div>)}
         </div>
+ 
         </>
     );
 }
