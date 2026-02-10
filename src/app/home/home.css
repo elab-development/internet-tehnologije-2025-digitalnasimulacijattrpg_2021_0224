@@ -20,6 +20,8 @@
 
 .stvarcine{
   width: 100%;
+  border: 1px solid white;
+  border-width: 1px 1px 1px 1px;
 }
 
 .stvari {
@@ -35,12 +37,12 @@
 }
 
 .btn {
-  background-color:#ff6550;
+  background-color:black;
   margin-top: 16px;
   width: 100%;      
   padding: 8px 16px;
   cursor: pointer;
-  border: 26px outset #ff6550;
+  border: 10px outset white;
   font-size: 1.75rem;
 }
 .btn:hover{
