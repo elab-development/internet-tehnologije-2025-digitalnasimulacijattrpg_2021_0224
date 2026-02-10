@@ -5,19 +5,20 @@ interface campaignProps {
 }
 
 export default function CampignForm({ campaign } : campaignProps) {
+    console.log(campaign,"ovo je kampanja");
     const disabled = (campaign != undefined)
     return (
         <form className="flex flex-col m-2 w-1/3 items-center">
             <input
                 type="text"
                 placeholder="Naziv"
-                defaultValue={campaign ? campaign.name : ""}
+                defaultValue={campaign!=undefined ? campaign.name : ""}
                 disabled={disabled}
             />
             <textarea 
                 placeholder="Opis"
                 className="mt-2"
-                defaultValue={campaign ? campaign.description : ""}
+                defaultValue={campaign!=undefined ? campaign.description : ""}
                 disabled={disabled}
             />
             {disabled &&
