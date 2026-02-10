@@ -27,7 +27,7 @@ export default function SignUpPage(){
     });
 
     if (res.ok) {
-        window.location.href = '/log-in/';
+        window.location.href = '/home/';
     } else {
         const data = await res.json();
         alert(`Error: ${data.error}`);
