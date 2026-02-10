@@ -3,7 +3,17 @@
 import CampignForm from "../components/campignForm"
 import CharSheetForm from "../components/charSheetForm"
 import { socket } from "../socket"
-import { campaign, charSheet } from "../types"
+import { campaign, charSheet, user } from "../types"
+
+const ignjat:user = {
+    id:"00000000-0000-0000-0000-000000000001",
+    username: "ignjat",
+}
+
+const zli4leksa:user = {
+    id:"00000000-0000-0000-0000-000000000000",
+    username: "zli4leksa",
+}
 
 export default function Test() {
     const test : charSheet = {
@@ -15,14 +25,14 @@ export default function Test() {
         armor : 5,
         hp : 5,
         currency : 11,
-        owner : null,
+        owner : zli4leksa,
     }
     const testCampaign : campaign = {
         id : "123e4567-e89b-12d3-a456-426614174000",
         name : "amf 015 prezivljavanje",
         description : "bol i patnja pakao i uzas muka i tuga",
         dateStart : new Date,
-        gameMaster : null,
+        gameMaster : ignjat,
     }
     const onClick = () => {
         socket.emit("joinCampaign", "Campaign 1")
