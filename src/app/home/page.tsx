@@ -44,8 +44,41 @@ function Home(){
         }
         return res.json();
     }
-    const {status, user, logout} = useAuth()//kfndklfnsfklnds
-     console.log(user,"ovo je user");
+// async function createCampaign({
+//   name,
+//   description,
+//   dateStart,
+//   gameMasterId,
+// }: {
+//   name: string;
+//   description: string;
+//   dateStart: Date;
+//   gameMasterId: string;
+// }) {
+//   const res = await fetch("/api/campaigns", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({
+//       name,
+//       description,
+//       dateStart: dateStart.toISOString(), // obavezno kao string
+//       gameMasterId,
+//     }),
+//   });
+
+//   if (!res.ok) {
+//     const err = await res.json();
+//     throw new Error(err.message || "Failed to create campaign");
+//   }
+
+//   const campaign = await res.json();
+//   return campaign;
+// }
+
+const {status, user, logout} = useAuth()//kfndklfnsfklnds
+console.log(user,"ovo je user");
 
 
 
@@ -80,21 +113,23 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
  
     function handleCampainOnClick(id:UUID){
         console.log("kliknuto dugme");
-        //radi popup za sammu kampanju koja prikazuje postojecu kampanju
+        console.log(clickedCampagin,"ovaj id je pre kliktanja dugmeta");
         setToggleCampaginForm(true);
         setClickedCampagin(id);
+        console.log(clickedCampagin,"ovaj je pred kraj kliktanja dugmeta");
     }
     function handleCsOnClick(id:UUID){
         console.log("kliknuto dugme za cs");
-        //radi popup za samu kampanju koja prikazuje postojeceg karaktera
         setToggleCharSheetForm(true);
         setClickedCharSheet(id);
     }
     function handleAddCs(){
-        //prikazuje popup, kupi podatke od popupa i sastavlja stvari u listu
+        setToggleCharSheetForm(true);
+        setClickedCharSheet(undefined);
     }
     function handleAddCampain(){
-        //radi isto ko i prethodna funkcija
+        setToggleCampaginForm(true);
+        setClickedCampagin(undefined);
     }
     
     return (
@@ -114,7 +149,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
                     }
                     
                 </div>
-                <button className='btn' onClick={handleAddCampain}>Kreiraj SVOJU kampanju</button>
+                <button className='btn' onClick={()=>{handleAddCampain()}}>Kreiraj SVOJU kampanju</button>
             </div>
 
             <div className="stvarcine">        
@@ -128,22 +163,20 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
                     }
                     
                 </div>
-                <button className='btn' onClick={handleAddCs}>Kreiraj NOVOG lika</button>
+                <button className='btn' onClick={()=>handleAddCs()}>Kreiraj NOVOG lika</button>
             </div>
             </div>
-              {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-white border-1'>
+              {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-black border-1'>
                 <button onClick={()=>{setToggleCampaginForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
-                <CampignForm campaign={campainList.find(cm=>{cm.id===clickedCampagin;
-                return cm;
-                })}></CampignForm>
+                <CampignForm campaign={campainList.find(cm=>cm.id===clickedCampagin)
+                }></CampignForm>
             
 
         </div>):(<div></div>)}
         {toggleCharSheetForm ? (<div className='popupSheet absolute left-20 up-50 bg-black border-1'>
             <button onClick={()=>{setToggleCharSheetForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
-            <CharSheetForm char={csList.find(cs=>{cs.id===clickedCharSheet;
-                return cs;
-            })}></CharSheetForm>
+            <CharSheetForm char={csList.find(cs=>cs.id===clickedCharSheet)
+            }></CharSheetForm>
         </div>):(<div></div>)}
         </div>
  
