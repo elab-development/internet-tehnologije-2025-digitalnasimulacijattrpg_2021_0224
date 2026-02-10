@@ -48,11 +48,9 @@ function Home(){
      console.log(user,"ovo je user");
 
 
-    const [csList,setCsList]=useState<charSheet[]>([]);
-    const [campainList,setCampainList]=useState<campaign[]>([]);
-   
 
-useEffect(() => {
+
+useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
   if (status === "authenticated" && user?.id) {
     fetchCampaigns(user.id)
       .then(data => {
@@ -73,21 +71,24 @@ useEffect(() => {
 
     const[toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
     const[toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
+    const [csList,setCsList]=useState<charSheet[]>([]);//lista charSheet
+    const [campainList,setCampainList]=useState<campaign[]>([]);//lista kampanja
+    const [clickedCharSheet,setClickedCharSheet]=useState<UUID | undefined>(undefined);//KLIKNUT KARAKTER
+    const [clickedCampagin,setClickedCampagin]=useState<UUID | undefined>(undefined);//KLIKNUTA KAMPANJA
    
 
-    let kam:UUID;
-    let charsheet:UUID;
+ 
     function handleCampainOnClick(id:UUID){
         console.log("kliknuto dugme");
         //radi popup za sammu kampanju koja prikazuje postojecu kampanju
         setToggleCampaginForm(true);
-        kam=id;
+        setClickedCampagin(id);
     }
     function handleCsOnClick(id:UUID){
         console.log("kliknuto dugme za cs");
         //radi popup za samu kampanju koja prikazuje postojeceg karaktera
         setToggleCharSheetForm(true);
-        charsheet=id;
+        setClickedCharSheet(id);
     }
     function handleAddCs(){
         //prikazuje popup, kupi podatke od popupa i sastavlja stvari u listu
@@ -130,15 +131,19 @@ useEffect(() => {
                 <button className='btn' onClick={handleAddCs}>Kreiraj NOVOG lika</button>
             </div>
             </div>
-                   {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-black border-1'>
-            <button onClick={()=>{setToggleCampaginForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
-            <CampignForm campaign={campainList.find(cm=>cm.id===kam)}></CampignForm>
+              {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-white border-1'>
+                <button onClick={()=>{setToggleCampaginForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
+                <CampignForm campaign={campainList.find(cm=>{cm.id===clickedCampagin;
+                return cm;
+                })}></CampignForm>
             
 
         </div>):(<div></div>)}
         {toggleCharSheetForm ? (<div className='popupSheet absolute left-20 up-50 bg-black border-1'>
             <button onClick={()=>{setToggleCharSheetForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
-            <CharSheetForm char={csList.find(cs=>cs.id===charsheet)}></CharSheetForm>
+            <CharSheetForm char={csList.find(cs=>{cs.id===clickedCharSheet;
+                return cs;
+            })}></CharSheetForm>
         </div>):(<div></div>)}
         </div>
  

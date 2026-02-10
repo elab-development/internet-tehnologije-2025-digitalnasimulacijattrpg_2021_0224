@@ -1,13 +1,8 @@
 import {db} from "@/db";
-import {usersTable, charSheetsTable,campaignsTable,campaignPlayersTable } from '@/db/schema';
+import {campaignsTable,campaignPlayersTable } from '@/db/schema';
 import { eq } from "drizzle-orm";
 import { NextResponse } from 'next/server';
-// import bcrypt from "bcrypt";
-// import {AUTH_COOKIE, cookieOptions, signAuthToken} from "@/lib/auth"; 
-// const MAGICNIBROJ = parseInt(process.env.MAGICNIBROJ!);
 import { campaign} from "@/app/types";
-// import type { NextApiRequest, NextApiResponse } from "next";
-// import { UUID } from "crypto";
 
 
 
