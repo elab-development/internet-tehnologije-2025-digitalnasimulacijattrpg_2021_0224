@@ -104,7 +104,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
 
             <div className="stvarcine">
                 <div className="stvari">
-                    <h4 className='naslov'>Lista kampanja</h4>
+                    <h4 className='naslov bg-gray-500 rounded-[95%_/_50%] p-3'>Lista kampanja</h4>
                     
                     {campainList.length===0 ? 
                     (<p className='komentar'>Nema aktivnih kamanja</p>) : 
@@ -114,12 +114,12 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
                     }
                     
                 </div>
-                <button className='btn' onClick={handleAddCampain}>Kreiraj SVOJU kampanju</button>
+                <button className='btn hover:text-pink-500 active:text-transparent' onClick={handleAddCampain}>Kreiraj SVOJU kampanju</button>
             </div>
 
             <div className="stvarcine">        
                 <div className='stvari'>
-                    <h4 className='naslov'>Lista karaktera</h4>
+                    <h4 className='naslov bg-gray-500 rounded-[95%_/_50%] p-3'>Lista karaktera</h4>
                     
                     {csList.length===0 ? (<p className='komentar'>Nema karaktera</p>) :
                     csList.map((container)=>(
@@ -128,7 +128,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
                     }
                     
                 </div>
-                <button className='btn' onClick={handleAddCs}>Kreiraj NOVOG lika</button>
+                <button className='btn hover:text-pink-500 active:text-transparent' onClick={handleAddCs}>Kreiraj NOVOG lika</button>
             </div>
             </div>
               {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-white border-1'>
