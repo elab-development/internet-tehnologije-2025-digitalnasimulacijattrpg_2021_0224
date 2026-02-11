@@ -20,6 +20,7 @@ containerID za zeljeni kontejner se moze videti sa
 
 ```
 sudo docker ps -a
+rosicev docker kontenjer: a8c6a1545054
 ```
 
 kreirati .env fajl sa relevantnim podacima po .env~ template-u

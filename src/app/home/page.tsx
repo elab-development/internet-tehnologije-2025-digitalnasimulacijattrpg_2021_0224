@@ -26,10 +26,8 @@ function Home(){
          const res = await fetch(`/api/campaginS?userId=${userId}`, {
         credentials: "include",
         });
-        console.log(res,"ovo je res");
 
         if (!res.ok) {
-            console.log("ne radi u pitanju res.ok",res.status);
             throw new Error("Fetch failed");
         }
 
@@ -37,15 +35,14 @@ function Home(){
     }
     async function fetchCharacterSheets(userId:string):Promise<charSheet[]>{
         const res=await fetch(`/api/charSheets?userId=${userId}`,{ credentials:"include"});
-        console.log(res,"ovo je res za ch");
         if(!res.ok){
-            console.log("res nije ok kod cs");
             throw new Error("Fetch failed cs");
         }
         return res.json();
     }
-    const {status, user, logout} = useAuth()//kfndklfnsfklnds
-     console.log(user,"ovo je user");
+
+
+const {status, user, logout} = useAuth()//kfndklfnsfklnds
 
 
 
@@ -54,16 +51,13 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
   if (status === "authenticated" && user?.id) {
     fetchCampaigns(user.id)
       .then(data => {
-        console.log("STIGLO:", data);
         setCampainList(data);
       })
       .catch(err => {
-        console.error("FETCH ERROR:", err);
       });
 
       fetchCharacterSheets(user.id)
       .then(sheets=>{
-        console.log("stigli sheets:",sheets);
         setCsList(sheets);
       })
     }
@@ -79,22 +73,20 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
 
  
     function handleCampainOnClick(id:UUID){
-        console.log("kliknuto dugme");
-        //radi popup za sammu kampanju koja prikazuje postojecu kampanju
         setToggleCampaginForm(true);
         setClickedCampagin(id);
     }
     function handleCsOnClick(id:UUID){
-        console.log("kliknuto dugme za cs");
-        //radi popup za samu kampanju koja prikazuje postojeceg karaktera
         setToggleCharSheetForm(true);
         setClickedCharSheet(id);
     }
     function handleAddCs(){
-        //prikazuje popup, kupi podatke od popupa i sastavlja stvari u listu
+        setToggleCharSheetForm(true);
+        setClickedCharSheet(undefined);
     }
     function handleAddCampain(){
-        //radi isto ko i prethodna funkcija
+        setToggleCampaginForm(true);
+        setClickedCampagin(undefined);
     }
     
     return (
@@ -114,7 +106,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
                     }
                     
                 </div>
-                <button className='btn hover:text-pink-500 active:text-transparent' onClick={handleAddCampain}>Kreiraj SVOJU kampanju</button>
+                <button className='btn hover:text-pink-500 active:text-transparent' onClick={()=>{handleAddCampain()}}>Kreiraj SVOJU kampanju</button>
             </div>
 
             <div className="stvarcine">        
@@ -128,22 +120,20 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
                     }
                     
                 </div>
-                <button className='btn hover:text-pink-500 active:text-transparent' onClick={handleAddCs}>Kreiraj NOVOG lika</button>
+                <button className='btn hover:text-pink-500 active:text-transparent' onClick={()=>handleAddCs()}>Kreiraj NOVOG lika</button>
             </div>
             </div>
-              {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-white border-1'>
+              {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-black border-1'>
                 <button onClick={()=>{setToggleCampaginForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
-                <CampignForm campaign={campainList.find(cm=>{cm.id===clickedCampagin;
-                return cm;
-                })}></CampignForm>
+                <CampignForm campaign={campainList.find(cm=>cm.id===clickedCampagin)
+                }></CampignForm>
             
 
         </div>):(<div></div>)}
         {toggleCharSheetForm ? (<div className='popupSheet absolute left-20 up-50 bg-black border-1'>
             <button onClick={()=>{setToggleCharSheetForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
-            <CharSheetForm char={csList.find(cs=>{cs.id===clickedCharSheet;
-                return cs;
-            })}></CharSheetForm>
+            <CharSheetForm char={csList.find(cs=>cs.id===clickedCharSheet)
+            }></CharSheetForm>
         </div>):(<div></div>)}
         </div>
  
