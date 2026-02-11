@@ -8,7 +8,6 @@ interface campaignProps {
 }
 
 export default function CampignForm({ campaign } : campaignProps) {
-    console.log(campaign,"ovo je kampanja");
     async function createNewCampagin(name:string,description:string,gameMaster:UUID) {
         const res=await fetch("/api/newCampagin",{
             method:"POST",
@@ -29,7 +28,6 @@ export default function CampignForm({ campaign } : campaignProps) {
     const[title,setTitle]=useState("");
     const[description,setDescription]=useState("");
     const {status, user, logout} = useAuth();
-
     
     const disabled = (campaign != undefined)
 

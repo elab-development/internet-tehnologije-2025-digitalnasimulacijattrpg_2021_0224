@@ -1,8 +1,8 @@
 import {db} from "@/db";
 import {campaignsTable } from '@/db/schema';
-import { eq } from "drizzle-orm";
+// import { eq } from "drizzle-orm";
 import { NextResponse } from 'next/server';
-import { campaign} from "@/app/types";
+// import { campaign} from "@/app/types";
 
 export async function POST(req:Request) {
     try{

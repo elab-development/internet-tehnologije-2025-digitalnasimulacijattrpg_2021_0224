@@ -26,10 +26,8 @@ function Home(){
          const res = await fetch(`/api/campaginS?userId=${userId}`, {
         credentials: "include",
         });
-        console.log(res,"ovo je res");
 
         if (!res.ok) {
-            console.log("ne radi u pitanju res.ok",res.status);
             throw new Error("Fetch failed");
         }
 
@@ -37,48 +35,14 @@ function Home(){
     }
     async function fetchCharacterSheets(userId:string):Promise<charSheet[]>{
         const res=await fetch(`/api/charSheets?userId=${userId}`,{ credentials:"include"});
-        console.log(res,"ovo je res za ch");
         if(!res.ok){
-            console.log("res nije ok kod cs");
             throw new Error("Fetch failed cs");
         }
         return res.json();
     }
-// async function createCampaign({
-//   name,
-//   description,
-//   dateStart,
-//   gameMasterId,
-// }: {
-//   name: string;
-//   description: string;
-//   dateStart: Date;
-//   gameMasterId: string;
-// }) {
-//   const res = await fetch("/api/campaigns", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       name,
-//       description,
-//       dateStart: dateStart.toISOString(), // obavezno kao string
-//       gameMasterId,
-//     }),
-//   });
 
-//   if (!res.ok) {
-//     const err = await res.json();
-//     throw new Error(err.message || "Failed to create campaign");
-//   }
-
-//   const campaign = await res.json();
-//   return campaign;
-// }
 
 const {status, user, logout} = useAuth()//kfndklfnsfklnds
-console.log(user,"ovo je user");
 
 
 
@@ -87,16 +51,13 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
   if (status === "authenticated" && user?.id) {
     fetchCampaigns(user.id)
       .then(data => {
-        console.log("STIGLO:", data);
         setCampainList(data);
       })
       .catch(err => {
-        console.error("FETCH ERROR:", err);
       });
 
       fetchCharacterSheets(user.id)
       .then(sheets=>{
-        console.log("stigli sheets:",sheets);
         setCsList(sheets);
       })
     }
@@ -112,14 +73,10 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
 
  
     function handleCampainOnClick(id:UUID){
-        console.log("kliknuto dugme");
-        console.log(clickedCampagin,"ovaj id je pre kliktanja dugmeta");
         setToggleCampaginForm(true);
         setClickedCampagin(id);
-        console.log(clickedCampagin,"ovaj je pred kraj kliktanja dugmeta");
     }
     function handleCsOnClick(id:UUID){
-        console.log("kliknuto dugme za cs");
         setToggleCharSheetForm(true);
         setClickedCharSheet(id);
     }
