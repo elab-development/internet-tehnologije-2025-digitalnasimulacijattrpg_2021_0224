@@ -32,8 +32,10 @@ export default function CampignForm({ campaign } : campaignProps) {
     const disabled = (campaign != undefined)
 
     return (
-        <form className="flex flex-col m-2 w-1/3 items-center">
+        <form className="flex flex-col w-full max-w-md mx-auto gap-3">
+            {/* flex flex-col m-2 w-1/3 items-center */}
             <input
+                className="w-full border p-2 rounded"
                 type="text"
                 placeholder="Naziv"
                 defaultValue={campaign!=undefined ? campaign.name : ""}
@@ -42,7 +44,7 @@ export default function CampignForm({ campaign } : campaignProps) {
             />
             <textarea 
                 placeholder="Opis"
-                className="mt-2"
+                className="w-full border p-2 rounded min-h-[200px] resize-none"
                 defaultValue={campaign!=undefined ? campaign.description : ""}
                 disabled={disabled}
                 onChange={(e) => setDescription(e.target.value)}

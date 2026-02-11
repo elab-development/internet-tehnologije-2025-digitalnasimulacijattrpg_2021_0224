@@ -46,19 +46,15 @@ export default function CharSheetForm({ char } : charSheetProps) {
             const[currency,setCurrency]=useState("");
             
             const {status, user, logout} = useAuth();
-            // const handleSubmit =async (e:SubmitEvent)=>{
-            //     e.preventDefault();
-            //     const res=await 
-            // }
     const disabled = (char != undefined)
     return (
         <form className="flex flex-col m-2 w-1/4 items-center" > 
-            {/* handleSubmit */}
             <input 
                 type="text"
                 placeholder="Ime"
                 defaultValue={char!=undefined ? char.name : ""}
                 disabled={disabled}
+                onChange={(e)=>{setName(e.target.value)}}
             />
             <div className="flex flex-row iems-center gap-5">
                 <div className="flex flex-col">

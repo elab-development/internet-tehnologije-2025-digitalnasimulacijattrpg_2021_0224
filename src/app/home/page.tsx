@@ -10,16 +10,6 @@ import charSheetForm from "../components/charSheetForm";
 import CampignForm from '../components/campignForm';
 import CharSheetForm from '../components/charSheetForm';
 
-
-interface ContainerData{
-    id:UUID;
-    name:string;
-    onClick:()=>void;
-}
-
-
-
-
 function Home(){
 
     async function fetchCampaigns(userId: string): Promise<campaign[]> {
@@ -41,11 +31,7 @@ function Home(){
         return res.json();
     }
 
-
 const {status, user, logout} = useAuth()//kfndklfnsfklnds
-
-
-
 
 useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
   if (status === "authenticated" && user?.id) {
@@ -69,8 +55,6 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
     const [campainList,setCampainList]=useState<campaign[]>([]);//lista kampanja
     const [clickedCharSheet,setClickedCharSheet]=useState<UUID | undefined>(undefined);//KLIKNUT KARAKTER
     const [clickedCampagin,setClickedCampagin]=useState<UUID | undefined>(undefined);//KLIKNUTA KAMPANJA
-   
-
  
     function handleCampainOnClick(id:UUID){
         setToggleCampaginForm(true);
@@ -123,15 +107,15 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
                 <button className='btn hover:text-pink-500 active:text-transparent' onClick={()=>handleAddCs()}>Kreiraj NOVOG lika</button>
             </div>
             </div>
-              {toggleCampaginForm ? (<div className='popupCampagin absolute left-20 up-50 bg-black border-1'>
-                <button onClick={()=>{setToggleCampaginForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
+              {toggleCampaginForm ? (<div className='forma'>
+                <button onClick={()=>{setToggleCampaginForm(false)}} className='btn_forma'>Close</button>
                 <CampignForm campaign={campainList.find(cm=>cm.id===clickedCampagin)
                 }></CampignForm>
             
 
         </div>):(<div></div>)}
-        {toggleCharSheetForm ? (<div className='popupSheet absolute left-20 up-50 bg-black border-1'>
-            <button onClick={()=>{setToggleCharSheetForm(false)}} className='popupdugme text-right hover:text-pink-500 active:text-transparent'>Close</button>
+        {toggleCharSheetForm ? (<div className='forma'>
+            <button onClick={()=>{setToggleCharSheetForm(false)}} className='btn_forma'>Close</button>
             <CharSheetForm char={csList.find(cs=>cs.id===clickedCharSheet)
             }></CharSheetForm>
         </div>):(<div></div>)}
