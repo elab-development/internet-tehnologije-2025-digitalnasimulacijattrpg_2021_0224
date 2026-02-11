@@ -14,8 +14,8 @@ function Container({ id,name, onClick }: ContainerProps) {
       onClick={()=>{onClick(id)}}
       className="
         cursor-pointer
-         border-[31px] border-black bg-[#6d6d6d]
-        hover: text-pink-500
+         border-[15px] border-white-400 bg-[#6d6d6d]
+        hover:text-pink-500
         w-[90%]
         m-3
       "
@@ -24,7 +24,7 @@ function Container({ id,name, onClick }: ContainerProps) {
     >
       <h3 className="
       text-shadow-custom
-      text-white
+      text-[#ffff0]
       hover:text-pink
       font-bold
       text-4xl">{name}</h3>

@@ -5,7 +5,7 @@ import { socket } from "../../socket"
 import Player from "@/app/components/Player"
 
 import { useParams } from 'next/navigation'
-import { user } from "@/app/types"
+import { user } from "../../types"
 import { useAuth } from "@/app/components/AuthProvider"
 
 export default function Session() {
@@ -18,9 +18,9 @@ export default function Session() {
 
     useEffect(()=> {
       if (status === 'authenticated' && user && !playerSent) {
+        socket.emit("joinCampaign", sessionID)
         socket.emit("player", user)
         setPlayerSent(true)
-        socket.emit("joinCampaign", sessionID)
         socket.on("pisi", (msg) => {
           console.log(msg)
         })
@@ -33,8 +33,10 @@ export default function Session() {
 
   console.log(players)
   return (
-      players.map((player)=>(
-        <Player u={player} />
-      ))
+    <div className="session p-1 border bt-0">
+      <div className="players flex flex-col p-1 gap-1">
+        {players.map((player)=>(<Player key={player.id} u={player} />))}
+      </div>
+    </div>
   )
 }
