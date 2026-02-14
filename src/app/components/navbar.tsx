@@ -7,7 +7,7 @@ import Image from "next/image";
 export function NavBar() {
 
     const {status, user, logout} = useAuth()
-    console.log("navbar user: " + user?.username);
+    //console.log("navbar user: " + user?.username);
  
     const [isPopupShown, setIsPopupShown] = useState(false);
     const togglePopupShown = () => {
@@ -55,7 +55,7 @@ export function NavBar() {
             {isPopupShown &&
             <div className="flex flex-col absolute right-1 top-1 bg-black border p-1 pt-0">
                 <button className="text-right hover:text-pink-500 active:text-transparent" onClick={togglePopupShown}> x </button>
-                <button className="border flex hover:text-pink-500 p-1 whitespace-nowrap active:text-transparent" onClick={onLogout} > <a href="/"> log out </a> </button>
+                <button className="border flex hover:text-pink-500 p-1 whitespace-nowrap active:text-transparent" onClick={onLogout} > log out </button>
             </div>
             }
         </div>
