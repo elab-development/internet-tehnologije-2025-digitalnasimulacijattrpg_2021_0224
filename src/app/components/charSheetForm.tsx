@@ -48,21 +48,22 @@ export default function CharSheetForm({ char } : charSheetProps) {
             const {status, user, logout} = useAuth();
     const disabled = (char != undefined)
     return (
-        <form className="flex flex-col m-2 w-1/4 items-center" > 
+        <form className="flex flex-col w-full max-w-2xl mx-auto px-8 py-6 text-xl text-white" > 
             <input 
                 type="text"
                 placeholder="Ime"
                 defaultValue={char!=undefined ? char.name : ""}
                 disabled={disabled}
                 onChange={(e)=>{setName(e.target.value)}}
+                className="mb-8 p-3 text-xl bg-zinc-900 border border-zinc-600 rounded-md focus:outline-none focus:border-pink-500 text-center"
             />
-            <div className="flex flex-row iems-center gap-5">
-                <div className="flex flex-col">
+            <div className="flex flex-row items-center gap-16">
+                <div className="flex flex-col gap-4">
                     <Polje  name="STR" value={char!=undefined ? char.str.toString() : ""} disabled={disabled} onChage={(e)=>{setStr(e.target.value)}}/>
                     <Polje name="DEX" value={char!=undefined ? char.dex.toString() : ""} disabled={disabled} onChage={(e)=>{setDex(e.target.value)}}/>
                     <Polje name="WILL" value={char!=undefined ? char.will.toString() : ""} disabled={disabled} onChage={(e)=>{setWill(e.target.value)}}/>
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col gap-4">
                     <Polje name="AR" value={char!=undefined ? char.armor.toString() : ""} disabled={disabled} onChage={(e)=>{setArmor(e.target.value)}}/>
                     <Polje name="HP" value={char!=undefined ? char.hp.toString() : ""} disabled={disabled} onChage={(e)=>{setHp(e.target.value)}}/>
                     <Polje name="CUR" value={char!=undefined ? char.currency.toString() : ""} disabled={disabled} onChage={(e)=>{setCurrency(e.target.value)}}/>
@@ -85,9 +86,9 @@ export default function CharSheetForm({ char } : charSheetProps) {
 
 function Polje({name,value,disabled,onChage}:Poljeprops) {
     return (
-        <div className="flex flex-row items-center mt-2 text-right justify-center">
-            <p className="flex-2 mr-1">{name}</p>
-            <input className="flex-1" defaultValue={value} disabled={disabled} onChange={onChage}></input>
+        <div className="flex flex-row items-center justify-between gap-4 text-xl">
+            <p className="w-16 font-semibold text-right">{name}</p>
+            <input className="w-24 p-2 bg-zinc-900 border border-zinc-600 rounded-md text-center focus:outline-none focus:border-pink-500" defaultValue={value} disabled={disabled} onChange={onChage}></input>
         </div>
     )
 }

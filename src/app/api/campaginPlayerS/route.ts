@@ -3,6 +3,7 @@ import {campaignsTable,campaignPlayersTable } from '@/db/schema';
 import { eq } from "drizzle-orm";
 import { NextResponse } from 'next/server';
 import { campaign} from "@/app/types";
+import { UUID } from "crypto";
 
 
 
@@ -21,17 +22,20 @@ export async function GET(req:Request) {
         return NextResponse.json({error:"No usserId found"},{status:400});
     }
         try{
-            const campsGM:any[]=await db.select().from(campaignsTable).where(eq(campaignsTable.gameMaster,userId));
-            const campaigns:campaign[]=campsGM.map(row=>{
+            console.log("radi li ovo uopste?????");
+            const campP:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersTable,eq(campaignPlayersTable.capmaign,campaignsTable.id)).where(eq(campaignPlayersTable.player,userId));
+           console.log(campP[0]);
+            console.log("radi??");
+            const res= campP.map(row=>{
             return{   
-                id : row.id,
-                name : row.name,
-                description : row.description,
-                dateStart : row.dateStart,
-                gameMaster : row.gameMaster,
-           }
-            })
-            return NextResponse.json(campaigns, { status: 200 });
+                id : row.Campaign.id,
+                name : row.Campaign.name,
+                description : row.Campaign.description,
+                dateStart : row.Campaign.dateStart,
+                gameMaster : row.Campaign.gameMaster,
+           
+            }});
+            return NextResponse.json(res, { status: 200 });
         }catch(err){
             console.log("Problem s bazom pri prikupljanju kampanja");
             throw new Error("poslednji catch u route!!");
