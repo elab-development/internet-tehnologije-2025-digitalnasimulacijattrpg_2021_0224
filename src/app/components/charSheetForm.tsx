@@ -57,7 +57,7 @@ export default function CharSheetForm({ char } : charSheetProps) {
                 onChange={(e)=>{setName(e.target.value)}}
                 className="mb-8 p-3 text-xl bg-zinc-900 border border-zinc-600 rounded-md focus:outline-none focus:border-pink-500 text-center"
             />
-            <div className="flex flex-row iems-center gap-16">
+            <div className="flex flex-row items-center gap-16">
                 <div className="flex flex-col gap-4">
                     <Polje  name="STR" value={char!=undefined ? char.str.toString() : ""} disabled={disabled} onChage={(e)=>{setStr(e.target.value)}}/>
                     <Polje name="DEX" value={char!=undefined ? char.dex.toString() : ""} disabled={disabled} onChage={(e)=>{setDex(e.target.value)}}/>

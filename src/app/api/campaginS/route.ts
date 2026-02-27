@@ -31,7 +31,7 @@ export async function GET(req:Request) {
                 gameMaster : row.gameMaster,
            }
             })
-            const campP:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersTable,eq(campaignPlayersTable.capmaign,campaignsTable.id)).where(eq(campaignPlayersTable.player,userId));
+            //const campP:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersTable,eq(campaignPlayersTable.capmaign,campaignsTable.id)).where(eq(campaignPlayersTable.player,userId));
             // campaigns.push(...campP.map(row=>{
             // return{   
             //     id : row.campaign.id,

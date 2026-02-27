@@ -28,7 +28,7 @@ export async function GET(req:Request) {
             console.log("radi??");
             const res= campP.map(row=>{
             return{   
-                id : row.id,
+                id : row.Campaign.id,
                 name : row.Campaign.name,
                 description : row.Campaign.description,
                 dateStart : row.Campaign.dateStart,

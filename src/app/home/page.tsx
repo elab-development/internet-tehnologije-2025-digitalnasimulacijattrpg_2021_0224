@@ -65,7 +65,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
     const[toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
     const[toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
     const [csList,setCsList]=useState<charSheet[]>([]);//lista charSheet
-    const [campainList,setCampainList]=useState<campaign[]>([]);//lista kampanja
+    const [campainList,setCampainList]=useState<campaign[]>([]);//lista kampanja gde je game master
     const [campainJoinList,setCampainJoinList]=useState<campaign[]>([]);//lista kampanja gde je dzoinovan
     const [clickedCharSheet,setClickedCharSheet]=useState<UUID | undefined>(undefined);//KLIKNUT KARAKTER
     const [clickedCampagin,setClickedCampagin]=useState<UUID | undefined>(undefined);//KLIKNUTA KAMPANJA
@@ -73,6 +73,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
     function handleCampainOnClick(id:UUID){
         setToggleCampaginForm(true);
         setClickedCampagin(id);
+
     }
     function handleCsOnClick(id:UUID){
         setToggleCharSheetForm(true);
@@ -134,8 +135,11 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
             </div>
               {toggleCampaginForm ? (<div className='forma'>
                 <button onClick={()=>{setToggleCampaginForm(false)}} className='btn_forma'>Close</button>
-                <CampignForm campaign={campainList.find(cm=>cm.id===clickedCampagin)
-                }></CampignForm>
+                <CampignForm campaign={
+                    campainList.find(cm=>cm.id===clickedCampagin) || campainJoinList.find(cm=>cm.id===clickedCampagin)
+                }
+                gm={!!campainList.find(cm => cm.id === clickedCampagin)}
+                ></CampignForm>
             
 
         </div>):(<div></div>)}
