@@ -31,16 +31,6 @@ export async function GET(req:Request) {
                 gameMaster : row.gameMaster,
            }
             })
-            //const campP:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersTable,eq(campaignPlayersTable.capmaign,campaignsTable.id)).where(eq(campaignPlayersTable.player,userId));
-            // campaigns.push(...campP.map(row=>{
-            // return{   
-            //     id : row.campaign.id,
-            //     name : row.campaign.name,
-            //     description : row.campaign.description,
-            //     dateStart : row.campaign.dateStart,
-            //     gameMaster : row.campaign.gameMaster,
-           
-            // }}));
             return NextResponse.json(campaigns, { status: 200 });
         }catch(err){
             console.log("Problem s bazom pri prikupljanju kampanja");

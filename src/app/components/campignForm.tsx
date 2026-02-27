@@ -2,6 +2,7 @@ import { campaign } from "../types";
 import { UUID } from "crypto";
 import { useState } from "react";
 import { useAuth } from "./AuthProvider";
+import {socket} from "../socket"
 
 interface campaignProps {
     campaign : campaign | undefined,
@@ -59,9 +60,10 @@ export default function CampignForm({ campaign,gm } : campaignProps) {
             }} className="border mt-2 w-1/2 hover:bg-pink-500">Kreiraj</button>
             }
             {disabled &&
-            <button onClick={()=>{
-                //sta sada ovde???
-                console.log("cita");
+            <button onClick={()=>{user!=null?
+                gm ? socket.emit("startSession",{campaignId:campaign.id,dm:user.id}) : socket.emit("joinSession",{campaignId:campaign.id,playerId:user.id}) :
+                console.log("user je null iz nekog razloga kliknuto je dugme za sesiju");
+                console.log("Ide dugme za soket");
             }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : "Udji u sesiju"}</button>
             }
         </form>
