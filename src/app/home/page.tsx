@@ -30,6 +30,13 @@ function Home(){
         }
         return res.json();
     }
+    async function fetchJoinedCampaigns(userId: string): Promise<campaign[]>{
+        const res=await fetch(`/api/campaginPlayerS?userId=${userId}`,{credentials:"include"});
+        if(!res.ok){
+            throw new Error("Fetch failed playerCampagin");
+        }
+        return res.json();
+    }
 
 const {status, user, logout} = useAuth()//kfndklfnsfklnds
 
@@ -45,7 +52,13 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
       fetchCharacterSheets(user.id)
       .then(sheets=>{
         setCsList(sheets);
+      });
+      fetchJoinedCampaigns(user.id)
+        .then(data => {
+        setCampainJoinList(data);
       })
+      .catch(err => {
+      });
     }
     }, [status, user?.id]);
 
@@ -53,6 +66,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
     const[toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
     const [csList,setCsList]=useState<charSheet[]>([]);//lista charSheet
     const [campainList,setCampainList]=useState<campaign[]>([]);//lista kampanja
+    const [campainJoinList,setCampainJoinList]=useState<campaign[]>([]);//lista kampanja gde je dzoinovan
     const [clickedCharSheet,setClickedCharSheet]=useState<UUID | undefined>(undefined);//KLIKNUT KARAKTER
     const [clickedCampagin,setClickedCampagin]=useState<UUID | undefined>(undefined);//KLIKNUTA KAMPANJA
  
@@ -77,10 +91,21 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
         <>
         <div className='glavni'>
             <div className='glavni-layout'>
-
+            <div className='stvarcine'>
+                <div className='stvari'>
+                    <h4 className='naslov bg-gray-500 rounded-[95%_/_50%] p-3'>Lista dzoinovanih kampanja</h4>
+                    {campainJoinList.length===0 ?
+                    (<p className='komentar'>Nema aktivnih kamanja</p>) :
+                    campainJoinList.map((container)=>(
+                        <Container key={container.id} id={container.id} name={container.name} onClick={()=>{handleCampainOnClick(container.id)}}></Container>
+                    ))
+                    }
+                </div>
+                <button className='btn hover:text-pink-500 active:text-transparent'>Nemam pojma neki join idk</button>
+            </div>
             <div className="stvarcine">
                 <div className="stvari">
-                    <h4 className='naslov bg-gray-500 rounded-[95%_/_50%] p-3'>Lista kampanja</h4>
+                    <h4 className='naslov bg-gray-500 rounded-[95%_/_50%] p-3'>Lista kreiranih kampanja</h4>
                     
                     {campainList.length===0 ? 
                     (<p className='komentar'>Nema aktivnih kamanja</p>) : 

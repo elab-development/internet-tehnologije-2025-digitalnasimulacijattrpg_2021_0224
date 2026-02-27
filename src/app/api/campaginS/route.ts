@@ -17,14 +17,12 @@ export async function GET(req:Request) {
              const userId = searchParams.get("userId");
     
     if(!userId){
-        console.log("nije nasao usera");
+        console.log("nije nasao usera kod u upisivanju kampanja");
         return NextResponse.json({error:"No usserId found"},{status:400});
     }
         try{
             const campsGM:any[]=await db.select().from(campaignsTable).where(eq(campaignsTable.gameMaster,userId));
-            console.log("ne radi prvi db.select");
             const campaigns:campaign[]=campsGM.map(row=>{
-           console.log("radi prvi map");
             return{   
                 id : row.id,
                 name : row.name,
@@ -34,20 +32,15 @@ export async function GET(req:Request) {
            }
             })
             const campP:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersTable,eq(campaignPlayersTable.capmaign,campaignsTable.id)).where(eq(campaignPlayersTable.player,userId));
-           console.log("ne radi drugi sb.select");
-
-            campaigns.push(...campP.map(row=>{
-           console.log("radi prvi map");
-
-            return{   
-                id : row.campaign.id,
-                name : row.campaign.name,
-                description : row.campaign.description,
-                dateStart : row.campaign.dateStart,
-                gameMaster : row.campaign.gameMaster,
+            // campaigns.push(...campP.map(row=>{
+            // return{   
+            //     id : row.campaign.id,
+            //     name : row.campaign.name,
+            //     description : row.campaign.description,
+            //     dateStart : row.campaign.dateStart,
+            //     gameMaster : row.campaign.gameMaster,
            
-            }}));
-            console.log("linija pre res.status(200), nadam se da je ubacio sve u jednu listu");
+            // }}));
             return NextResponse.json(campaigns, { status: 200 });
         }catch(err){
             console.log("Problem s bazom pri prikupljanju kampanja");

@@ -1,8 +1,6 @@
 import {db} from "@/db";
 import {campaignsTable } from '@/db/schema';
-// import { eq } from "drizzle-orm";
 import { NextResponse } from 'next/server';
-// import { campaign} from "@/app/types";
 
 export async function POST(req:Request) {
     try{
@@ -10,7 +8,7 @@ export async function POST(req:Request) {
         console.log("nije trazen dobar metod");
         return NextResponse.json({error:"Nedobar metod, nije POST"},{status:405});
     }
-    //naziv, opis, gejmaster
+    
     const{name,description,gameMaster}=await req.json();
     if(!name||!description||!gameMaster){
         return NextResponse.json({error:"Nedobro popunjeno"},{status:400});
