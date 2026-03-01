@@ -21,6 +21,12 @@ export const campaignPlayersTable =pgTable("campainPlayers", {
   player: uuid().notNull().references(() => usersTable.id),
 });
 
+export const campaignPlayersCharSheetsTable = pgTable("campaignPlayersCharSheets", {
+  campaign: uuid().notNull().references(() => campaignsTable.id),
+  player: uuid().notNull().references(() => usersTable.id),
+  charSheet: uuid().notNull().references(() => charSheetsTable.id),
+})
+
 export const campaignDocumentsTable =pgTable("campaignDocuments", {
   capmaign: uuid().notNull().references(() => campaignsTable.id),
   document: uuid().notNull().references(() => documentsTable.id),
