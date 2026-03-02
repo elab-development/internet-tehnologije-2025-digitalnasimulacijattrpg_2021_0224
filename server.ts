@@ -15,25 +15,25 @@ const handler = app.getRequestHandler()
 
 // types
 
-enum fileType {
-    pdf,
-    png,
-    jpeg,
-}
+//export enum fileType {
+//    pdf,
+//    png,
+//    jpeg,
+//}
 
-type player = {
+export type player = {
     id : UUID,
     username: string,
     charSheet: charSheet,
     online: boolean,
 }
 
-type DM = {
+export type DM = {
     id : string,
     username: string,
 }
 
-type campaign = {
+export type campaign = {
     id : UUID,
     name : string,
     description : string,
@@ -43,14 +43,14 @@ type campaign = {
     documents : Array<document>,
 }
 
-type document = {
+export type document = {
     id : UUID,
     name : string,
-    type : fileType,
+    type : string,
     filepath : string,
 }
 
-type charSheet = {
+export type charSheet = {
     id : UUID,
     name : string,
     str : number,
@@ -62,7 +62,7 @@ type charSheet = {
     notes : Array<note>
 }
 
-type note = {
+export type note = {
     id : UUID,
     content : string,
 }
