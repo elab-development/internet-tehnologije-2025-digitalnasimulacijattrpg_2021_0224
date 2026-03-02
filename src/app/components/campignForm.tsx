@@ -60,8 +60,8 @@ export default function CampignForm({ campaign,gm } : campaignProps) {
             }} className="border mt-2 w-1/2 hover:bg-pink-500">Kreiraj</button>
             }
             {disabled &&
-            <button onClick={()=>{user!=null?
-                gm ? socket.emit("startSession",{campaignId:campaign.id,dm:user.id}) : socket.emit("joinSession",{campaignId:campaign.id,playerId:user.id}) :
+            <button type="button" onClick={()=>{user!=null?
+                gm ? socket.emit("startSession", campaign.id, user.id) : socket.emit("joinSession", campaign.id, user.id) :
                 console.log("user je null iz nekog razloga kliknuto je dugme za sesiju");
                 console.log("Ide dugme za soket");
             }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : "Udji u sesiju"}</button>

@@ -46,8 +46,9 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
     socket.on("update", (campaign: s_campaign) => {
         console.log(campaign)
     })
-    socket.on("redirect", () => {
-        
+    socket.on("redirect", (url) => {
+        console.log("redirect")
+        window.location.href = url
     })
 
   if (status === "authenticated" && user?.id) {
