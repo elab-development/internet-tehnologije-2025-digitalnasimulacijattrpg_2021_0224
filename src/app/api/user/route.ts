@@ -1,6 +1,6 @@
-import { db } from "@/db";
-import { usersTable } from "@/db/schema";
-import { AUTH_COOKIE, vertifyAuthToken } from "@/lib/auth";
+import { db } from "../../../db";
+import { usersTable } from "../../../db/schema";
+import { AUTH_COOKIE, vertifyAuthToken } from "../../../lib/auth";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";

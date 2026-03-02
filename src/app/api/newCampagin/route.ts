@@ -1,5 +1,5 @@
-import {db} from "@/db";
-import {campaignsTable } from '@/db/schema';
+import { db } from '../../../db';
+import { campaignsTable } from '../../../db/schema';
 import { NextResponse } from 'next/server';
 
 export async function POST(req:Request) {

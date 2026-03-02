@@ -1,6 +1,6 @@
-import { charSheet} from "@/app/types";
-import {db} from "@/db";
-import {charSheetsTable } from '@/db/schema';
+import { charSheet } from '../../types';
+import { db } from '../../../db';
+import {charSheetsTable } from '../../../db/schema';
 import { eq } from "drizzle-orm";
 import { NextResponse } from 'next/server';
 
