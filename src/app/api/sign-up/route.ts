@@ -6,6 +6,18 @@ import bcrypt from "bcrypt";
 import {AUTH_COOKIE, cookieOptions, signAuthToken} from "../../../lib/auth"; 
 const MAGICNIBROJ = parseInt(process.env.MAGICNIBROJ!); 
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
+}
+
 type Body = {
     username: string;
     password: string;

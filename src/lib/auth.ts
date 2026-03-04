@@ -33,7 +33,8 @@ export function vertifyAuthToken(token: string) {
 export function cookieOptions(){
     return {
         httpOnly: true,
-        sameSite: 'lax' as const,
+        sameSite: 'strict' as const,
+        secure: true,
         //secure: process.env.NODE_ENV === 'production',
         path: '/',
         maxAge: 7 * 24 * 60 * 60
