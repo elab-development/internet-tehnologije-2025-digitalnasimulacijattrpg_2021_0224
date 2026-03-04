@@ -1,5 +1,5 @@
 import "dotenv/config";
-import {usersTable,charSheetsTable,campaignsTable,campaignPlayersTable} from "./schema";
+import {usersTable,charSheetsTable,campaignsTable,campaignPlayersTable, campaignPlayersCharSheetsTable} from "./schema";
 import { db } from "./index";
 import bcrypt from "bcrypt";
 import { timestamp } from "drizzle-orm/gel-core";
@@ -118,6 +118,15 @@ await db.transaction(async (tx) => {
         {
             capmaign: "00000000-0000-0000-0000-100000000000",
             player: "00000000-0000-0000-0000-000000000001"
+        },
+    ]).onConflictDoNothing();
+});
+await db.transaction(async (tx) => {
+    await tx.insert(campaignPlayersCharSheetsTable).values([
+        {
+            campaign: "00000000-0000-0000-0000-100000000000",
+            player: "00000000-0000-0000-0000-000000000001",
+            charSheet:"00000000-0000-0000-0000-00000000000d"
         },
     ]).onConflictDoNothing();
 });
