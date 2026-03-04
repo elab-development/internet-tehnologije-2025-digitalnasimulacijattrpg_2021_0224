@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { socket } from "../../socket"
-import Player from "@/app/components/Player"
+import Player from "../../components/Player" 
 
 import { useParams } from 'next/navigation'
 import { user } from "../../types"
-import { useAuth } from "@/app/components/AuthProvider"
+import { useAuth } from "../../components/AuthProvider"
 
 export default function Session() {
   const {status, user, logout} = useAuth()
