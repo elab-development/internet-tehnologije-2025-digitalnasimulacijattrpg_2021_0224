@@ -8,6 +8,8 @@ import { useAuth } from "../components/AuthProvider";
 import charSheetForm from "../components/charSheetForm";
 import CampignForm from '../components/campignForm';
 import CharSheetForm from '../components/charSheetForm';
+import { socket } from '../socket';
+import { campaign as s_campaign } from '../../../server';
 
 function Home(){
 
@@ -40,6 +42,15 @@ function Home(){
 const {status, user, logout} = useAuth()//kfndklfnsfklnds
 
 useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
+
+    socket.on("update", (campaign: s_campaign) => {
+        console.log(campaign)
+    })
+    socket.on("redirect", (url) => {
+        console.log("redirect")
+        window.location.href = url
+    })
+
   if (status === "authenticated" && user?.id) {
     fetchCampaigns(user.id)
       .then(data => {

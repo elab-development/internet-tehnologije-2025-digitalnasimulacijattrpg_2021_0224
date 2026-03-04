@@ -1,4 +1,5 @@
-import { integer, numeric, timestamp, pgTable, varchar, uuid, pgEnum } from "drizzle-orm/pg-core";
+import { Column } from "drizzle-orm";
+import { integer, numeric, timestamp, pgTable, varchar, uuid, pgEnum, primaryKey } from "drizzle-orm/pg-core";
 
 export const filetypeEnum = pgEnum('filetype', ['pdf', 'png', 'jpeg'])
 
@@ -19,12 +20,24 @@ export const campaignsTable = pgTable("Campaign", {
 export const campaignPlayersTable =pgTable("campainPlayers", {
   capmaign: uuid().notNull().references(() => campaignsTable.id),
   player: uuid().notNull().references(() => usersTable.id),
-});
+},(table) => [
+  primaryKey({ columns: [table.capmaign, table.player] }),
+]);
 
-export const campaignDocumentsTable =pgTable("campaignDocuments", {
+export const campaignPlayersCharSheetsTable = pgTable("campaignPlayersCharSheets", {
+  campaign: uuid().notNull().references(() => campaignsTable.id),
+  player: uuid().notNull().references(() => usersTable.id),
+  charSheet: uuid().notNull().references(() => charSheetsTable.id),
+},(t) => [
+  primaryKey({ columns: [t.campaign, t.player, t.charSheet] }),
+])
+
+export const campaignDocumentsTable = pgTable("campaignDocuments", {
   capmaign: uuid().notNull().references(() => campaignsTable.id),
   document: uuid().notNull().references(() => documentsTable.id),
-});
+}, (t) => [
+  primaryKey({ columns: [t.capmaign, t.document] }),
+]);
 
 export const documentsTable = pgTable("Document", {
   id: uuid().primaryKey().defaultRandom(),

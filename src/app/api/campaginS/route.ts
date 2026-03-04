@@ -1,10 +1,21 @@
-import {db} from "@/db";
-import {campaignsTable,campaignPlayersTable } from '@/db/schema';
+import { db } from "../../../db";
+import {campaignsTable } from '../../../db/schema';
 import { eq } from "drizzle-orm";
 import { NextResponse } from 'next/server';
-import { campaign} from "@/app/types";
+import { campaign } from "../../types";
 
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "http://localhost:3000",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Credentials": "true",
+    },
+  });
+}
 
 export async function GET(req:Request) {
     if(req.method!=="GET"){

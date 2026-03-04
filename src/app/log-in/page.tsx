@@ -26,6 +26,7 @@ export default function LogIn(){
         alert("Failed to log in");
     }
 }
+
 return (
     <div className="min-h-screen flex items-center justify-center">
         <form 
