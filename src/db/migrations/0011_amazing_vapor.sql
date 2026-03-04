@@ -1,0 +1,3 @@
+ALTER TABLE "campaignDocuments" ADD CONSTRAINT "campaignDocuments_capmaign_document_pk" PRIMARY KEY("capmaign","document");--> statement-breakpoint
+ALTER TABLE "campaignPlayersCharSheets" ADD CONSTRAINT "campaignPlayersCharSheets_campaign_player_charSheet_pk" PRIMARY KEY("campaign","player","charSheet");--> statement-breakpoint
+ALTER TABLE "campainPlayers" ADD CONSTRAINT "campainPlayers_capmaign_player_pk" PRIMARY KEY("capmaign","player");
