@@ -1,10 +1,11 @@
 import { createServer } from "node:http"
 import next from "next"
 import { Server } from "socket.io"
-import { UUID } from "node:crypto"
-import { db } from "@/db"
-import { campaignDocumentsTable, campaignPlayersCharSheetsTable, campaignPlayersTable, campaignsTable, charSheetsTable, documentsTable, notesTable, usersTable } from "@/db/schema"
+import { db } from "./src/db/index.ts"
+import { campaignDocumentsTable, campaignPlayersCharSheetsTable, campaignPlayersTable, campaignsTable, charSheetsTable, documentsTable, notesTable, usersTable } from "./src/db/schema.ts"
 import { eq } from "drizzle-orm"
+
+type UUID = `${string}-${string}-${string}-${string}-${string}`
 
 const dev = process.env.NODE_ENV !== "production"
 const hostname = "localhost"
@@ -15,25 +16,25 @@ const handler = app.getRequestHandler()
 
 // types
 
-enum fileType {
-    pdf,
-    png,
-    jpeg,
-}
+//export enum fileType {
+//    pdf,
+//    png,
+//    jpeg,
+//}
 
-type player = {
+export type player = {
     id : UUID,
     username: string,
     charSheet: charSheet,
     online: boolean,
 }
 
-type DM = {
+export type DM = {
     id : string,
     username: string,
 }
 
-type campaign = {
+export type campaign = {
     id : UUID,
     name : string,
     description : string,
@@ -43,14 +44,14 @@ type campaign = {
     documents : Array<document>,
 }
 
-type document = {
+export type document = {
     id : UUID,
     name : string,
-    type : fileType,
+    type : string,
     filepath : string,
 }
 
-type charSheet = {
+export type charSheet = {
     id : UUID,
     name : string,
     str : number,
@@ -62,7 +63,7 @@ type charSheet = {
     notes : Array<note>
 }
 
-type note = {
+export type note = {
     id : UUID,
     content : string,
 }
@@ -104,8 +105,11 @@ app.prepare().then(() => {
             io.to(room).emit("pisi", "test")
         })
         socket.on("startSession", async (campaignID : UUID, dmID : UUID) => {
+            console.log("\n\n\n==============================")
+            console.log("\t> startSession: campaignID:", campaignID, " dmID: ", dmID)
             if (sessions.has(campaignID)) {
                 //handle
+                socket.emit("redirect", "session/"+campaignID)
                 return
             }
             const db_campaign: any[] = await db.select()
@@ -192,7 +196,7 @@ app.prepare().then(() => {
             sessions.set(campaignID, campaign)
             socket.join(campaignID)
             // emit page redirect
-            socket.emit("redirect")
+            socket.emit("redirect", "session/"+campaignID)
             io.to(campaignID).emit("update", sessions.get(campaignID))
         })
         socket.on("joinSession", (campaignID : UUID, playerID : UUID) => {

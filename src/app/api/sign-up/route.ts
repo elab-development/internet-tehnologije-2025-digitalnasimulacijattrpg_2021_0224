@@ -1,9 +1,9 @@
-import {db} from "@/db";
-import {usersTable } from '@/db/schema';
+import { db } from "../../../db";
+import { usersTable } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from 'next/server';
 import bcrypt from "bcrypt";
-import {AUTH_COOKIE, cookieOptions, signAuthToken} from "@/lib/auth"; 
+import {AUTH_COOKIE, cookieOptions, signAuthToken} from "../../../lib/auth"; 
 const MAGICNIBROJ = parseInt(process.env.MAGICNIBROJ!); 
 
 type Body = {
