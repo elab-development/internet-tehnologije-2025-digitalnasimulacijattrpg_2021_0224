@@ -1,5 +1,5 @@
 import "dotenv/config";
-import {usersTable,charSheetsTable,campaignsTable,campaignPlayersTable} from "./schema";
+import {usersTable,charSheetsTable,campaignsTable,campaignPlayersTable, campaignPlayersCharSheetsTable} from "./schema";
 import { db } from "./index";
 import bcrypt from "bcrypt";
 import { timestamp } from "drizzle-orm/gel-core";
@@ -25,7 +25,7 @@ await db.transaction(async (tx) => {
             username: "horrorrosic",
             password: rs,
         }
-    ]);
+    ]).onConflictDoNothing();
 });
 
 await db.transaction(async (tx) => {
@@ -62,9 +62,19 @@ await db.transaction(async (tx) => {
             hp : 1,
             currency : 4,
             owner : "00000000-0000-0000-0000-000000000003", 
-       }
-       
-    ]);
+       },
+       {
+            id:"00000000-0000-0000-0000-00000000000d",
+            name:"Slavoljubomir",
+            str : 16,
+            dex : 8,
+            will : 13,
+            armor : 10,
+            hp : 10,
+            currency : 2,
+            owner : "00000000-0000-0000-0000-000000000001", 
+       },
+    ]).onConflictDoNothing();
 });
 await db.transaction(async (tx) => {
     await tx.insert(campaignsTable).values([
@@ -93,20 +103,32 @@ await db.transaction(async (tx) => {
                 gameMaster : "00000000-0000-0000-0000-000000000000"
         }
         
-    ]);
+    ]).onConflictDoNothing();
 });
 await db.transaction(async (tx) => {
     await tx.insert(campaignPlayersTable).values([
-        // {
-        //     capmaign: "00000000-0000-0000-0000-400000000000",
-        //     player: "00000000-0000-0000-0000-000000000003"
-        // }
+        {
+            capmaign: "00000000-0000-0000-0000-400000000000",
+            player: "00000000-0000-0000-0000-000000000003"
+        },
         {
             capmaign: "00000000-0000-0000-0000-300000000000",
             player: "00000000-0000-0000-0000-000000000003"
-        }
-        
-    ]);
+        },
+        {
+            capmaign: "00000000-0000-0000-0000-100000000000",
+            player: "00000000-0000-0000-0000-000000000001"
+        },
+    ]).onConflictDoNothing();
+});
+await db.transaction(async (tx) => {
+    await tx.insert(campaignPlayersCharSheetsTable).values([
+        {
+            campaign: "00000000-0000-0000-0000-100000000000",
+            player: "00000000-0000-0000-0000-000000000001",
+            charSheet:"00000000-0000-0000-0000-00000000000d"
+        },
+    ]).onConflictDoNothing();
 });
 
 process.exit(0);
