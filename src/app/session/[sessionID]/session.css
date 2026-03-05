@@ -4,7 +4,7 @@
   min-height: 100vh;
 }
 
-.levaStrana {
+.levo {
   flex: 1;              /* zauzima sav preostali prostor */
   padding: 1rem;
   background-color: aqua;
@@ -36,7 +36,7 @@
 }
 
 /* SveDesno - desni panel */
-.sveDesno {
+.desno {
   /* position: fixed;  */
   /* top: 0; */
   /* right: 0; */
