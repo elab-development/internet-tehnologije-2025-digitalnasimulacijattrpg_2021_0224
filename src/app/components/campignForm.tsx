@@ -1,15 +1,16 @@
 import { campaign } from "../types";
 import { UUID } from "crypto";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import {socket} from "../socket"
 
 interface campaignProps {
     campaign : campaign | undefined,
-    gm:boolean
+    gm:boolean,
+    invited:boolean,
 }
 
-export default function CampignForm({ campaign,gm } : campaignProps) {
+export default function CampignForm({ campaign,gm,invited } : campaignProps) {
     async function createNewCampagin(name:string,description:string,gameMaster:UUID) {
         const res=await fetch("/api/newCampagin",{
             method:"POST",
@@ -26,12 +27,45 @@ export default function CampignForm({ campaign,gm } : campaignProps) {
             throw new Error("ne rade stvari, prbolem u fetch kod home page");
         }
         
-    };
+    }
+    
+    async function fetchLjudi(){//uzima aktivne igrace iz CP
+         const res = await fetch(`/api/playersInCampagin?campaginId=${campaign?.id}`, {
+        credentials: "include",
+        });
+
+        if (!res.ok) {
+            throw new Error("Ne radi fetch, problem pri uzimaju igraca kampanje");
+        }
+
+        return res.json();
+    }
+    async function killPlayer(){
+        //ukloni igraca iz kampanje, cp i cps
+    }
+    type user={
+        id:UUID,
+        username:string
+    }
     const[title,setTitle]=useState("");
     const[description,setDescription]=useState("");
     const {status, user, logout} = useAuth();
+    const [players,setPlayers]=useState<user[]>([])
     
     const disabled = (campaign != undefined)
+
+    useEffect(()=>{
+        if(status==="authenticated"&&user!=null){
+        if(disabled){
+        fetchLjudi()
+      .then(data => {
+        setPlayers(data);
+      })
+      .catch(err => {
+      });
+        }
+    }
+    },[])
 
     return (
         <form className="flex flex-col w-full max-w-md mx-auto gap-3">
@@ -50,6 +84,7 @@ export default function CampignForm({ campaign,gm } : campaignProps) {
                 disabled={disabled}
                 onChange={(e) => setDescription(e.target.value)}
             />
+
             {disabled &&
               <label className="border mt-2 items-center" >{new Date(campaign!.dateStart).toLocaleDateString("sr-RS")}</label>
             }
@@ -61,11 +96,35 @@ export default function CampignForm({ campaign,gm } : campaignProps) {
             }
             {disabled &&
             <button type="button" onClick={()=>{user!=null?
-                gm ? socket.emit("startSession", campaign.id, user.id) : socket.emit("joinSession", campaign.id, user.id) :
+                gm ? socket.emit("startSession", campaign.id, user.id) :
+                invited ? console.log("ovde radim popup za karaktere koji se prikazuju") :
+                 socket.emit("joinSession", campaign.id, user.id) :
                 console.log("user je null iz nekog razloga kliknuto je dugme za sesiju");
-                console.log("Ide dugme za soket");
-            }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : "Udji u sesiju"}</button>
+            }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : invited ? "Dodaj karaktera" :"Udji u sesiju"}</button>
+            }
+            {disabled ?
+                <div className="flex flex-col w-fit">
+                    {players.length===0 ? <p>Kampanja nema igraca</p>:
+                    players.map((player)=>(
+                        <div
+                         key={player.id}>{player.username}</div>
+                    ))
+                    }
+                </div>:
+                <></>
+            }
+            {(disabled&&gm)?
+            <button>Dodaj igraca</button>:<></>
             }
         </form>
+    )
+}
+
+function FreeChar(){
+    return(
+        <div>lejaut verovatno
+            <div>Lista karakera</div>
+            <button>Napravi novog karaktera, najverovatnije charSheet forma</button>
+        </div>
     )
 }
