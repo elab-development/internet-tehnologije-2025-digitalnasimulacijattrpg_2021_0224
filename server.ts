@@ -89,7 +89,7 @@ app.prepare().then(() => {
             console.log("\t> startSession: campaignID:", campaignID, " dmID: ", dmID)
             if (sessions.has(campaignID)) {
                 //handle
-                socket.emit("redirect", "session/"+campaignID)
+                socket.emit("redirect", "sessionGM/"+campaignID)
                 return
             }
             const db_campaign: any[] = await db.select()
@@ -152,6 +152,7 @@ app.prepare().then(() => {
                     online: false,
                 }
             }))
+
             const db_documents: any[] = await db.select()
                 .from(campaignDocumentsTable)
                 .innerJoin(documentsTable, eq(campaignDocumentsTable.capmaign, campaignID))
@@ -163,6 +164,7 @@ app.prepare().then(() => {
                     filepath: row.Document.filepath,
                 }
             })
+
             let campaign : campaign = {
                 id : cmp.id,
                 name : cmp.name,
