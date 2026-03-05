@@ -175,7 +175,7 @@ app.prepare().then(() => {
 
             sessions.set(campaignID, campaign)
             socket.join(campaignID)
-            socket.emit("redirect", "session/"+campaignID)
+            socket.emit("redirect", "sessionGM/"+campaignID)
             io.to(campaignID).emit("update", sessions.get(campaignID))
         })
         socket.on("joinSession", (campaignID : UUID, playerID : UUID) => {
