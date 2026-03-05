@@ -107,7 +107,10 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
                     {players.length===0 ? <p>Kampanja nema igraca</p>:
                     players.map((player)=>(
                         <div
-                         key={player.id}>{player.username}</div>
+                         key={player.id}>{player.username}
+                        {gm && (<button onClick={()=>{console.log("ker pisa piskilica")}}>Zakolji svinje sekirom ga ubij</button>)}
+                         </div>
+                         
                     ))
                     }
                 </div>:
