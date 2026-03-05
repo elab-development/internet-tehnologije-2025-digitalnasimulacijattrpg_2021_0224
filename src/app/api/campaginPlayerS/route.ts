@@ -33,7 +33,6 @@ export async function GET(req:Request) {
     }
         try{
             const campP:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersTable,eq(campaignPlayersTable.capmaign,campaignsTable.id)).where(eq(campaignPlayersTable.player,userId));
-           console.log(campP[0]);
             const res= campP.map(row=>{
             return{   
                 id : row.Campaign.id,
