@@ -1,11 +1,11 @@
 import { createServer } from "node:http"
 import next from "next"
-import { Server } from "socket.io"
+import { DefaultEventsMap, Server, Socket } from "socket.io"
 import { db } from "./src/db/index.ts"
 import { campaignDocumentsTable, campaignPlayersCharSheetsTable, campaignPlayersTable, campaignsTable, charSheetsTable, documentsTable, notesTable, usersTable } from "./src/db/schema.ts"
 import { eq } from "drizzle-orm"
 
-type UUID = `${string}-${string}-${string}-${string}-${string}`
+type UUID = `${string}-${string}-${string}-${string}-${string}` | string
 
 const dev = process.env.NODE_ENV !== "production"
 const hostname = "localhost"
@@ -69,6 +69,8 @@ export type note = {
 }
 
 let sessions = new Map<UUID, campaign>()
+let clients = new Map<string, Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>>()
+let rooms = new Map<string, Array<string>>
 
 app.prepare().then(() => {
     const httpServer = createServer(handler)
@@ -76,6 +78,11 @@ app.prepare().then(() => {
     const io = new Server(httpServer)
 
     io.on("connection", (socket) => {
+
+        const connectionID = socket.handshake.auth.sessionID
+        clients.set(connectionID, socket)
+
+        let test = socket
 
         // kada se user konektuje gleda se da li je u kampanji ili na homepage-u
         // - ako je na homepage-u salje mu se info o aktivnim kampanjama kojima se moze prikljuciti
@@ -176,55 +183,64 @@ app.prepare().then(() => {
             }
 
             sessions.set(campaignID, campaign)
-            socket.join(campaignID)
+            addToRoom(campaignID, connectionID)
             socket.emit("redirect", "sessionGM/"+campaignID)
-            io.to(campaignID).emit("update", sessions.get(campaignID))
+            emitToRoom(campaignID, "update", sessions.get(campaignID))
         })
         socket.on("joinSession", (campaignID : UUID, playerID : UUID) => {
-            console.log("\t\t>join")
-            if (!sessions.has(campaignID)) {
-                console.log("\t\t> nema sesije")
-                // handle
-                return
-            }
-            let playerIndex = playerInCampaign(playerID, campaignID)
-            console.log("\t\t> " + playerIndex)
-            if (playerIndex == -1) {
-                // handle
-                return
-            }
-            console.log("\t> Session join request: \n\t\tcampaign: " + sessions.get(campaignID)?.name + "\n\t\tplayer: " + sessions.get(campaignID)?.players.at(playerIndex))
-            sessions.get(campaignID)!.players.at(playerIndex)!.online = true
-            for (let room in socket.rooms) {
-                removePlayerFromSession(playerIndex, room)
-                socket.leave(room)
-            }
-            socket.join(campaignID)
-            socket.emit("redirect", "session/"+campaignID)
-            io.to(campaignID).emit("update", sessions.get(campaignID))
-            console.log("\t> ", sessions.get(campaignID)?.players.at(playerIndex)?.username, " joined ", sessions.get(campaignID)?.name)
+           // console.log("\t\t>join")
+           // if (!sessions.has(campaignID)) {
+           //     console.log("\t\t> nema sesije")
+           //     // handle
+           //     return
+           // }
+           // let playerIndex = playerInCampaign(playerID, campaignID)
+           // console.log("\t\t> " + playerIndex)
+           // if (playerIndex == -1) {
+           //     // handle
+           //     return
+           // }
+           // console.log("\t> Session join request: \n\t\tcampaign: " + sessions.get(campaignID)?.name + "\n\t\tplayer: " + sessions.get(campaignID)?.players.at(playerIndex))
+           // sessions.get(campaignID)!.players.at(playerIndex)!.online = true
+           // for (let room in socket.rooms) {
+           //     removePlayerFromSession(playerIndex, room)
+           //     socket.leave(room)
+           // }
+           // addToRoom(campaignID, connectionID)
+           // socket.emit("redirect", "session/"+campaignID)
+           // emitToRoom(campaignID, "update", sessions.get(campaignID))
+           // console.log("\t> ", sessions.get(campaignID)?.players.at(playerIndex)?.username, " joined ", sessions.get(campaignID)?.name)
         })
         socket.on("leaveSession", (campaignID : UUID, playerID : UUID) => {
-            let playerIndex = playerInCampaign(playerID, campaignID)
-            if (playerIndex == -1) {
-                // handle
-                return
-            }
-            removePlayerFromSession(playerIndex, campaignID)
-            socket.leave(campaignID)
-            socket.emit("redirect", "/home")
+           // let playerIndex = playerInCampaign(playerID, campaignID)
+           // if (playerIndex == -1) {
+           //     // handle
+           //     return
+           // }
+           // removePlayerFromSession(playerIndex, campaignID)
+           // socket.leave(campaignID)
+           // socket.emit("redirect", "/home")
+           // emitToRoom(campaignID, "update", sessions.get(campaignID))
         })
         socket.on("abortSession", (campaignID : UUID, gmID : UUID) => {
-            if (sessions.get(campaignID)?.gameMaster.id !== gmID) {
-                //handle
-                return
-            }
-            let socketIDs = io.sockets.adapter.rooms.get(campaignID)
-            for (let socketID in socketIDs) {
-                io.sockets.sockets.get(socketID)?.leave(campaignID)
-                socket.emit("redirect", "/home")
-            }
-            sessions.delete(campaignID)
+           // if (sessions.get(campaignID)?.gameMaster.id !== gmID) {
+           //     //handle
+           //     return
+           // }
+           // let socketIDs = io.sockets.adapter.rooms.get(campaignID)
+           // for (let socketID in socketIDs) {
+           //     io.sockets.sockets.get(socketID)?.leave(campaignID)
+           //     socket.emit("redirect", "/home")
+           // }
+           // sessions.delete(campaignID)
+           // emitToRoom(campaignID, "update", sessions.get(campaignID))
+        })
+        socket.on("updateRequest", () => {
+            console.log("\t\t> update request")
+            io.of('/').adapter.sids.get(socket.id)?.forEach((room) => {
+                console.log(room)
+                socket.emit("update", sessions.get(room))
+            })
         })
     })
 
@@ -253,4 +269,17 @@ function playerInCampaign(playerID : UUID, campaignID : UUID) {
 
 function removePlayerFromSession(playerIndex : number, room : any) {
     sessions.get(room)!.players.at(playerIndex)!.online = false
+}
+
+function emitToRoom(roomID : string, event : string, ...args : any[]) {
+    rooms.get(roomID)?.forEach((connectionID) => {
+        clients.get(connectionID)?.emit(event, ...args)
+    })
+}
+
+function addToRoom(roomID : string, connectionID : string) {
+    if (!rooms.has(roomID)) {
+        rooms.set(roomID, new Array<string>())
+    }
+    rooms.get(roomID)?.push(connectionID)
 }
