@@ -40,8 +40,16 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
 
         return res.json();
     }
-    async function killPlayer(){
+    async function killPlayer(playerId:UUID){
         //ukloni igraca iz kampanje, cp i cps
+        const res=await fetch(`/api/removePlayer?playerId=${playerId}`, {
+        credentials: "include",
+        method:"DELETE"
+
+        });
+        if(!res.ok){
+            throw new Error("Neuspesno uklonjen igrac iz kampanje")
+        }
     }
     type user={
         id:UUID,
@@ -108,7 +116,7 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
                     players.map((player)=>(
                         <div
                          key={player.id}>{player.username}
-                        {gm && (<button onClick={()=>{console.log("ker pisa piskilica")}}>Zakolji svinje sekirom ga ubij</button>)}
+                        {gm && (<button className="border mt-2 w-1/2 hover:bg-pink-500" onClick={()=>{killPlayer(player.id)}}>Zakolji svinje sekirom ga ubij</button>)}
                          </div>
                          
                     ))
@@ -117,7 +125,7 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
                 <></>
             }
             {(disabled&&gm)?
-            <button>Dodaj igraca</button>:<></>
+            <button className="border mt-2 w-1/2 hover:bg-pink-500">Dodaj igraca</button>:<></>
             }
         </form>
     )
