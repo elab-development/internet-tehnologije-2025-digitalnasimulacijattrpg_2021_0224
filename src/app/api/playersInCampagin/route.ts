@@ -38,7 +38,6 @@ export async function GET(req:Request,) {
         try{
             const p:any[]=await db.select().from(campaignPlayersTable).innerJoin(usersTable,eq(usersTable.id,campaignPlayersTable.player)).where((eq(campaignPlayersTable.capmaign,campaginId)))
             const players=p.map(player=>{
-                console.log(player)
                 return{
                     id:player.User.id,
                     username:player.User.username,

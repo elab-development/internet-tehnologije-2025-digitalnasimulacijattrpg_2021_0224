@@ -1,8 +1,10 @@
-import { campaign } from "../types";
+import { campaign, charSheet } from "../types";
 import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import {socket} from "../socket"
+import charSheetForm from "./charSheetForm.tsx";
+import Container from "./Container.tsx";
 
 interface campaignProps {
     campaign : campaign | undefined,
@@ -28,7 +30,6 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
         }
         
     }
-    
     async function fetchLjudi(){//uzima aktivne igrace iz CP
          const res = await fetch(`/api/playersInCampagin?campaginId=${campaign?.id}`, {
         credentials: "include",
@@ -49,6 +50,15 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
         });
         if(!res.ok){
             throw new Error("Neuspesno uklonjen igrac iz kampanje")
+        }
+    }
+    async function getCharSheets(){//uzima karaktere za dodeljivanje karaktera kampanji
+        const res = await fetch(`/api/charSheets?userId=${user}`,{
+            credentials:"include",
+            method:"GET"
+        })
+        if(!res.ok){
+            throw new Error("Neuspesno izvuceni karakteri")
         }
     }
     type user={
@@ -131,10 +141,38 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
     )
 }
 
-function FreeChar(){
+function FreeChar(user:UUID){
+    
+
+    async function getCharSheets():Promise<charSheet[]>{
+        const res = await fetch(`/api/charSheets?userId=${user}`,{
+            credentials:"include",
+            method:"GET"
+        })
+        if(!res.ok){
+            throw new Error("Neuspesno izvuceni karakteri")
+        }
+        return res.json()
+    }
+    useEffect(()=>{
+        getCharSheets()
+      .then(sheets=>{
+        setSheets(sheets);
+      });
+    },[])
+    const [sheets,setSheets]=useState<charSheet[]>([])
+    function handleSheetClick(){
+        console.log("u izgradi je stvar sta da vam radim KAFIC DOZVOLJAVA LAPTOPOVE DO 7 JER SU KUL I FANKI IDK NEMOJ JEBEM")
+    }
     return(
         <div>lejaut verovatno
-            <div>Lista karakera</div>
+            <div>
+                {sheets.length===0?(<p>Nema nedodeljenih karaktera</p>):(
+                    sheets.map((sheet)=>(
+                        <Container id={sheet.id} name={sheet.name} onClick={()=>handleSheetClick()}></Container>
+                    ))
+                )}
+            </div>
             <button>Napravi novog karaktera, najverovatnije charSheet forma</button>
         </div>
     )

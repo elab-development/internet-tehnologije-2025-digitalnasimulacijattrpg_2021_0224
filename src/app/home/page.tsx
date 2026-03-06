@@ -152,7 +152,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektu
                 <button className='btn hover:text-pink-500 active:text-transparent' onClick={()=>handleAddCs()}>Kreiraj NOVOG lika</button>
             </div>
             </div>
-              {toggleCampaginForm ? (<div className='forma'>
+              {toggleCampaginForm && (<div className='forma'>
                 <button onClick={()=>{setToggleCampaginForm(false)}} className='btn_forma'>Close</button>
                 <CampignForm campaign={
                     campainList.find(cm=>cm.id===clickedCampagin) || campainJoinList.find(cm=>cm.id===clickedCampagin)||campainInvite.find(cm=>cm.id===clickedCampagin)//najverovatnije mora da se menja kod
@@ -162,12 +162,12 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektu
                 ></CampignForm>
             
 
-        </div>):(<div></div>)}
-        {toggleCharSheetForm ? (<div className='forma'>
+        </div>)}
+        {toggleCharSheetForm && (<div className='forma'>
             <button onClick={()=>{setToggleCharSheetForm(false)}} className='btn_forma'>Close</button>
             <CharSheetForm char={csList.find(cs=>cs.id===clickedCharSheet)
             }></CharSheetForm>
-        </div>):(<div></div>)}
+        </div>)}
         </div>
  
         </>
