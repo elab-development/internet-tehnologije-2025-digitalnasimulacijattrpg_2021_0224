@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { socket } from "../../socket"
+import { connectionID, socket } from "../../socket"
 import Player from "../../components/Player" 
 import { campaign } from "../../../../server"
 import { useAuth } from "../../components/AuthProvider"
@@ -23,7 +23,7 @@ export default function Session() {
           console.log("state", state)
         })
       }
-    })
+    }, [status, user])
 
   return (
     <div className="layout">
