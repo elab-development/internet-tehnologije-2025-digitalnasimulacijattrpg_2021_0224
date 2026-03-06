@@ -3,7 +3,7 @@ import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
 import {socket} from "../socket"
-import charSheetForm from "./charSheetForm.tsx";
+import CharSheetForm from "./charSheetForm.tsx";
 import Container from "./Container.tsx";
 
 interface campaignProps {
@@ -120,7 +120,7 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
                 console.log("user je null iz nekog razloga kliknuto je dugme za sesiju");
             }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : invited ? "Dodaj karaktera" :"Udji u sesiju"}</button>
             }
-            {disabled ?
+            {disabled &&
                 <div className="flex flex-col w-fit">
                     {players.length===0 ? <p>Kampanja nema igraca</p>:
                     players.map((player)=>(
@@ -131,12 +131,13 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
                          
                     ))
                     }
-                </div>:
-                <></>
+                </div>
             }
-            {(disabled&&gm)?
-            <button className="border mt-2 w-1/2 hover:bg-pink-500">Dodaj igraca</button>:<></>
+            {(disabled && gm) &&
+            <button className="border mt-2 w-1/2 hover:bg-pink-500">Dodaj igraca</button>
+            // ovde se dodaje igrac
             }
+            <div>Najverovatnije ovde ide popup</div>
         </form>
     )
 }
@@ -161,19 +162,28 @@ function FreeChar(user:UUID){
       });
     },[])
     const [sheets,setSheets]=useState<charSheet[]>([])
-    function handleSheetClick(){
-        console.log("u izgradi je stvar sta da vam radim KAFIC DOZVOLJAVA LAPTOPOVE DO 7 JER SU KUL I FANKI IDK NEMOJ JEBEM")
+    const [toggleForm,setToggleForm]=useState<boolean>(false)
+    const [selectedSheet,setSelectedSheet]=useState<charSheet | undefined>()
+    function handleSheetClick(sheet:charSheet | undefined){
+        console.log("")
+        setToggleForm(true)
+        setSelectedSheet(sheet)
     }
+    useEffect(()=>{},[toggleForm])
+
     return(
         <div>lejaut verovatno
             <div>
                 {sheets.length===0?(<p>Nema nedodeljenih karaktera</p>):(
                     sheets.map((sheet)=>(
-                        <Container id={sheet.id} name={sheet.name} onClick={()=>handleSheetClick()}></Container>
+                        <Container id={sheet.id} name={sheet.name} onClick={()=>handleSheetClick(sheet)}></Container>
                     ))
                 )}
             </div>
-            <button>Napravi novog karaktera, najverovatnije charSheet forma</button>
+            {!toggleForm && (<button onClick={()=>handleSheetClick(undefined)}>Napravi novog karaktera, najverovatnije charSheet forma</button>)}
+                {toggleForm && (<div className="ovdeIdeTailwind">
+                    <CharSheetForm char={selectedSheet}></CharSheetForm>
+                </div>)}
         </div>
     )
 }
