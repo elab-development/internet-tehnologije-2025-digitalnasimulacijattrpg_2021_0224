@@ -3,7 +3,7 @@ import next from "next"
 import { Server, Socket } from "socket.io"
 import { db } from "./src/db/index.ts"
 import { campaignDocumentsTable, campaignPlayersCharSheetsTable, campaignPlayersTable, campaignsTable, charSheetsTable, documentsTable, notesTable, usersTable } from "./src/db/schema.ts"
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 
 type UUID = `${string}-${string}-${string}-${string}-${string}` | string
 
@@ -121,15 +121,21 @@ app.prepare().then(() => {
                 id : dmID,
                 username : db_gm[0].username,
             }
-            const db_players: any[] = await db.select()
+            const db_players = await db.select()
                 .from(campaignPlayersTable)
                 .innerJoin(usersTable, eq(campaignPlayersTable.player, usersTable.id))
                 .where(eq(campaignPlayersTable.capmaign, campaignID))
             let players: Array<player> = await Promise.all(
                 db_players.map(async row => {
                 const db_charSheet: any[] = await db.select()
-                    .from(campaignPlayersCharSheetsTable)
-                    .innerJoin(charSheetsTable, eq(campaignPlayersCharSheetsTable.campaign, campaignID) && eq(campaignPlayersCharSheetsTable.player, row.User.id))
+                    .from(charSheetsTable)
+                    .innerJoin(campaignPlayersCharSheetsTable, eq(charSheetsTable.id, campaignPlayersCharSheetsTable.charSheet))
+                    .where(
+                        and(
+                            eq(campaignPlayersCharSheetsTable.campaign, campaignID),
+                            eq(campaignPlayersCharSheetsTable.player, row.User.id)
+                        )
+                    )
                 const cs = db_charSheet[0].CharSheet
                 const db_notes: any[] = await db.select()
                     .from(notesTable)
