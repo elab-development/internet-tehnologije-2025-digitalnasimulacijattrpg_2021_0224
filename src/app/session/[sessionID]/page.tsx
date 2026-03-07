@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { connectionID, socket } from "../../socket"
-import Player from "../../components/Player" 
+import { socket } from "../../socket"
+import Player from "../../components/session/Player" 
 import { campaign, player } from "../../../../server"
 import { useAuth } from "../../components/AuthProvider"
-import "./session.css"
-import CharSheetForm from "../../components/charSheetForm"
+import CharSheetDisplay from "../../components/session/charSheetDisplay"
+import NoteDisplay from "../../components/session/noteDisplay"
+import { NavBar } from "../../components/navbar"
 
 export default function Session() {
   const {status, user, logout} = useAuth()
@@ -14,57 +15,51 @@ export default function Session() {
   const [state, setState] = useState<campaign>()
   const [player, setPlayer] = useState<player>()
 
-    useEffect(()=> {
-      if (status === 'authenticated' && user) {
-        console.log("use effect")
-        socket.emit("updateRequest")
-        console.log("update req emitovan")
-        socket.on("update", (campaign : campaign) => {
-          setState(campaign)
-          let p = undefined
-          campaign?.players.forEach((player) => {
-            console.log(player.id, user.id)
-            if (player.id == user.id) {
-              p = player
-              console.log(p)
-              return
-            }
-          })
-          setPlayer(p)
+  useEffect(()=> {
+    if (status === 'authenticated' && user) {
+      socket.emit("updateRequest")
+      socket.on("update", (campaign : campaign) => {
+        setState(campaign)
+        let p = undefined
+        campaign?.players.forEach((player) => {
+          console.log(player.id, user.id)
+          if (player.id == user.id) {
+            p = player
+            console.log(p)
+            return
+          }
         })
-      }
-    }, [status, user])
+        setPlayer(p)
+      })
+    }
+  }, [status, user])
 
   return (
-    <div className="layout">
-    <div className="levo">
-      <div className="kampanja bg-blue-500 ">
-        <div className="naslov bg-white-500">{state?.name}</div>
-        <div className="opis">{state?.description}</div>
-      </div>
-      <div className="dokument bg-green-500">Dva kostura se dogovarajy djir na motoru</div>
-      <div className="listaIgraca flex flex-row align-right bg-black" >
-        {state?.players.map((player)=>(
-          player.id !== user?.id &&<Player p={player}></Player>
-        ))}
-      </div>
-      </div>
-      <div className="desno bg-red-500">
-        <div className="notes bg-pink-500">Zabeleske</div>
-        <div className="karakter bg-black">
-          <p className="border p-1 text-center font-bold mb-1">{player?.charSheet.name}</p>
-          <div className="flex flex-row justify-evenly gap-1">
-            <div className="flex flex-col gap-1 w-1/2">
-              <p className="csdata border p-1 w-auto">str {player?.charSheet.str}</p>
-              <p className="csdata border p-1 w-auto">dex {player?.charSheet.dex}</p>
-              <p className="csdata border p-1 w-auto">will {player?.charSheet.will}</p>
-            </div>
-            <div className="flex flex-col gap-1 w-1/2">
-              <p className="csdata border p-1 w-auto">ar {player?.charSheet.armor}</p>
-              <p className="csdata border p-1 w-auto">hp {player?.charSheet.hp}</p>
-              <p className="csdata border p-1 w-auto">cur {player?.charSheet.currency}</p>
-            </div>
+    <div className="page flex flex-col h-screen w-screen fixed">
+      <NavBar />
+      <div className="body flex flex-row h-full border border-t-0">
+        <div className="left flex flex-col justify-between w-3/4">
+          <div className="campaign bg-black">
+            <div className="naslov font-extrabold text-4xl text-center border border-r-0 p-2">{state?.name}</div>
+            <div className="opis border border-t-0 border-r-0 p-2 text-justify">{state?.description}</div>
           </div>
+          <div className="documents">Dva kostura se dogovarajy djir na motoru</div>
+          <div className="players flex flex-row justify-end bg-black gap-1" >
+            {state?.players.map((player)=>(
+              player.id !== user?.id
+              && <Player key={player.id} p={player}></Player>
+            ))}
+          </div>
+        </div>
+        <div className="right border-l flex flex-col justify-between w-1/4">
+          <div className="notes flex flex-col gap-1 bg-black p-1 border">
+            <p className="font-bold text-center border">notes</p>
+            {player?.charSheet.notes.map((note) => (
+              <NoteDisplay key={note.id} n={note}/>
+            ))}
+            <button className="btnAddNote border font-bold hover:text-pink-500">dodaj belesku</button>
+          </div>
+          <CharSheetDisplay cs={player?.charSheet}/>
         </div>
       </div>
     </div>
