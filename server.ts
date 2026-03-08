@@ -222,7 +222,6 @@ app.prepare().then(() => {
             sessions.get(campaignID)?.players.forEach((player) => {
                 console.log("\t\t", player.username)
             })
-            emitToRoom(campaignID, "update", sessions.get(campaignID))
             emitUpdate(campaignID)
             console.log("==============================")
         })
@@ -269,7 +268,6 @@ app.prepare().then(() => {
 function playerInCampaign(playerID : UUID, campaignID : UUID) {
     let indeks : number = -1
     sessions.get(campaignID)?.players.forEach((player, index) => {
-        console.log("\t\t\t> ",player.id, playerID)
         if (player.id === playerID) {
             indeks = index
         }
@@ -289,7 +287,8 @@ function emitToRoom(roomID : string, event : string, ...args : any[]) {
 
 function emitUpdate(roomID : string) {
     const session = sessions.get(roomID)
-    console.log("\t> sending state update to ", session?.name)
+    console.log("\t> sending state update to", session?.name)
+    console.log("\t\tklijenti u sobi", rooms.get(roomID))
     rooms.get(roomID)?.forEach((client) => {
         clients.get(client)?.emit("update", session)
         console.log("\t\tsent to ", client)
@@ -302,6 +301,9 @@ function addToRoom(roomID : string, connectionID : string) {
     }
     rooms.get(roomID)?.add(connectionID)
     clientRooms.set(connectionID, roomID)
+    console.log("\t> klijent", connectionID, "dodat u sobu", roomID)
+    console.log("\t\trooms", rooms)
+    console.log("\t\tclientRooms")
 }
 
 function removeFromRoom(roomID : string, connectionID : string) {

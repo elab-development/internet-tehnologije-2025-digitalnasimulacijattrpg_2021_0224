@@ -13,7 +13,7 @@ export default function Session() {
   const {status, user, logout} = useAuth()
 
   const [state, setState] = useState<campaign>()
-  const [player, setPlayer] = useState<player>()
+  const [player, setPlayer] = useState<player | null>()
 
   useEffect(()=> {
     if (status === 'authenticated' && user) {
@@ -29,6 +29,9 @@ export default function Session() {
             return
           }
         })
+        if (campaign.gameMaster.id === user.id) {
+          p = null
+        }
         setPlayer(p)
       })
     }
@@ -47,7 +50,7 @@ export default function Session() {
           <div className="players flex flex-row justify-end bg-black gap-1" >
             {state?.players.map((pl)=>(
               pl.id !== user?.id
-              && <Player key={pl.id} p={pl} dm={player?.id === state.gameMaster.id} />
+              && <Player key={pl.id} p={pl} dm={player === null} />
             ))}
           </div>
         </div>
@@ -59,7 +62,7 @@ export default function Session() {
             ))}
             <button className="btnAddNote border font-bold hover:text-pink-500">dodaj belesku</button>
           </div>
-          {player !== undefined 
+          {player !== null
             && <CharSheetDisplay cs={player?.charSheet} />}
         </div>
       </div>
