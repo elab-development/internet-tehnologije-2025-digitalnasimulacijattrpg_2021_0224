@@ -38,6 +38,10 @@ export default function Session() {
     }
   }, [status, user, socket])
 
+  const handleSkillCkeckClick = (p : player) => {
+    socket?.emit("SkillCheck", p)
+  }
+
   return (
     <div className="page flex flex-col h-screen w-screen fixed">
       <NavBar />
@@ -51,7 +55,7 @@ export default function Session() {
           <div className="players flex flex-row justify-end bg-black gap-1" >
             {state?.players.map((pl)=>(
               pl.id !== user?.id
-              && <Player key={pl.id} p={pl} dm={player === null} />
+              && <Player key={pl.id} p={pl} dm={player === null} btnSkillCheck={handleSkillCkeckClick} />
             ))}
           </div>
         </div>
@@ -61,7 +65,10 @@ export default function Session() {
             {player?.charSheet.notes.map((note) => (
               <NoteDisplay key={note.id} n={note}/>
             ))}
-            <button className="btnAddNote border font-bold hover:text-pink-500">dodaj belesku</button>
+            <button className="btnAddNote border font-bold
+              hover:text-pink-500
+              active:text-transparent"
+              onClick={()=>{}}>dodaj belesku</button>
           </div>
           {player !== null
             && <CharSheetDisplay cs={player?.charSheet} />}

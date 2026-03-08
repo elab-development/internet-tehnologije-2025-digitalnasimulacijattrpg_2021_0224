@@ -1,16 +1,19 @@
 import { JSX, useState } from "react";
 import { player } from "../../../../server";
 import CharSheetDisplay from "./charSheetDisplay";
+import Kockice from "../kockice";
 
 
 interface playerProps {
     p: player,
-    dm: boolean
+    dm: boolean,
+    btnSkillCheck : (p : player) => void
 }
 
 
-export default function Player({p, dm} : playerProps) {
+export default function Player({p, dm, btnSkillCheck} : playerProps) {
     const [showCharSheet, setShowCharSheet] = useState<boolean>(false)
+    const [showSkillCheck, setShowSkillCheck] = useState<boolean>(false)
 
     const colorBgOffline = "bg-pink-900"
     const colorTextOffline = "text-pink-950"
@@ -24,11 +27,18 @@ export default function Player({p, dm} : playerProps) {
                 active:text-transparent"
                 onClick={()=>{
                     setShowCharSheet(!showCharSheet)
-                    // handle
+                    btnSkillCheck(p)
                 }}
             >Skill Check!</button>}</>
         )
     }
+
+    const renderSkillCheck = () => {
+        return (
+            <Kockice />
+        )
+    }
+
     return (
         <div className="relative inline-block">
         {showCharSheet && <Popup 
