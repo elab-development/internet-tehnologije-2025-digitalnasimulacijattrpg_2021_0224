@@ -8,7 +8,7 @@ import { useAuth } from "../components/AuthProvider";
 import charSheetForm from "../components/charSheetForm";
 import CampignForm from '../components/campignForm';
 import CharSheetForm from '../components/charSheetForm';
-import { socket } from '../socket';
+import { useSocket } from '../components/socketManager';
 import { campaign as s_campaign } from '../../../server';
 
 function Home(){
@@ -40,16 +40,19 @@ function Home(){
     }
 
 const {status, user, logout} = useAuth()//kfndklfnsfklnds
+const socket = useSocket()
 
 useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
 
-    socket.on("update", (campaign: s_campaign) => {
-        console.log(campaign)
-    })
-    socket.on("redirect", (url) => {
-        console.log("redirect")
-        window.location.href = url
-    })
+    if (socket) {
+        socket.on("update", (campaign: s_campaign) => {
+            console.log(campaign)
+        })
+        socket.on("redirect", (url) => {
+            console.log("redirect")
+            window.location.href = url
+        })
+    }
 
   if (status === "authenticated" && user?.id) {
     fetchCampaigns(user.id)
@@ -70,7 +73,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
       .catch(err => {
       });
     }
-    }, [status, user?.id]);
+    }, [status, user?.id, socket]);
 
     const[toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
     const[toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);

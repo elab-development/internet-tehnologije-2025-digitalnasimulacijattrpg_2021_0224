@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { socket } from "../../socket"
+import { useSocket } from "../../components/socketManager"
 import Player from "../../components/session/Player" 
 import { campaign, player } from "../../../../server"
 import { useAuth } from "../../components/AuthProvider"
@@ -11,12 +11,13 @@ import { NavBar } from "../../components/navbar"
 
 export default function Session() {
   const {status, user, logout} = useAuth()
+  const socket = useSocket()
 
   const [state, setState] = useState<campaign>()
   const [player, setPlayer] = useState<player | null>()
 
   useEffect(()=> {
-    if (status === 'authenticated' && user) {
+    if (status === 'authenticated' && user && socket) {
       socket.emit("updateRequest")
       socket.on("update", (campaign : campaign) => {
         setState(campaign)
@@ -35,7 +36,7 @@ export default function Session() {
         setPlayer(p)
       })
     }
-  }, [status, user])
+  }, [status, user, socket])
 
   return (
     <div className="page flex flex-col h-screen w-screen fixed">

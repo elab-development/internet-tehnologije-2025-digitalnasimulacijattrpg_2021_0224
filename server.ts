@@ -73,8 +73,8 @@ let sessions = new Map<UUID, campaign>()
 // ... kompajlira se bez problema ...
 // ... ako se uradi import kompajliranje fejluje jer DefaultEventMap export ne postoji ...
 let clients = new Map<string, Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>>()
-let rooms = new Map<string, Set<string>> // campaignID, connectionID[]
-let clientRooms = new Map<string, string> // connectionID, campaignID
+let rooms = new Map<string, Set<string>> // campaignID, uid[]
+let clientRooms = new Map<string, string> // uid, campaignID
 
 app.prepare().then(() => {
     const httpServer = createServer(handler)
@@ -83,8 +83,9 @@ app.prepare().then(() => {
 
     io.on("connection", (socket) => {
 
-        const connectionID = socket.handshake.auth.sessionID
-        clients.set(connectionID, socket)
+        const uid = socket.handshake.auth.uid
+        console.log("\t> soket konektovan, uid:", uid)
+        clients.set(uid, socket)
 
         // kada se user konektuje gleda se da li je u kampanji ili na homepage-u
         // - ako je na homepage-u salje mu se info o aktivnim kampanjama kojima se moze prikljuciti
@@ -191,7 +192,7 @@ app.prepare().then(() => {
             }
 
             sessions.set(campaignID, campaign)
-            addToRoom(campaignID, connectionID)
+            addToRoom(campaignID, uid)
             socket.emit("redirect", "session/"+campaignID)
             console.log("==============================")
         })
@@ -213,9 +214,9 @@ app.prepare().then(() => {
             sessions.get(campaignID)!.players.at(playerIndex)!.online = true
             for (let room in rooms) {
                 removePlayerFromSession(playerIndex, room)
-                removeFromRoom(room, connectionID)
+                removeFromRoom(room, uid)
             }
-            addToRoom(campaignID, connectionID)
+            addToRoom(campaignID, uid)
             socket.emit("redirect", "session/"+campaignID)
             console.log("\t> ", sessions.get(campaignID)?.players.at(playerIndex)?.username, " joined ", sessions.get(campaignID)?.name)
             console.log("\t> players in session:")
@@ -251,7 +252,7 @@ app.prepare().then(() => {
         })
         socket.on("updateRequest", () => {
             console.log("\t\t> update request")
-            clients.get(connectionID)?.emit("update", sessions.get(clientRooms.get(connectionID)!))
+            clients.get(uid)?.emit("update", sessions.get(clientRooms.get(uid)!))
         })
     })
 
@@ -280,8 +281,8 @@ function removePlayerFromSession(playerIndex : number, campaignID : any) {
 }
 
 function emitToRoom(roomID : string, event : string, ...args : any[]) {
-    rooms.get(roomID)?.forEach((connectionID) => {
-        clients.get(connectionID)?.emit(event, ...args)
+    rooms.get(roomID)?.forEach((uid) => {
+        clients.get(uid)?.emit(event, ...args)
     })
 }
 
@@ -295,18 +296,18 @@ function emitUpdate(roomID : string) {
     })
 }
 
-function addToRoom(roomID : string, connectionID : string) {
+function addToRoom(roomID : string, uid : string) {
     if (!rooms.has(roomID)) {
         rooms.set(roomID, new Set<string>())
     }
-    rooms.get(roomID)?.add(connectionID)
-    clientRooms.set(connectionID, roomID)
-    console.log("\t> klijent", connectionID, "dodat u sobu", roomID)
+    rooms.get(roomID)?.add(uid)
+    clientRooms.set(uid, roomID)
+    console.log("\t> klijent", uid, "dodat u sobu", roomID)
     console.log("\t\trooms", rooms)
     console.log("\t\tclientRooms")
 }
 
-function removeFromRoom(roomID : string, connectionID : string) {
-    rooms.get(roomID)?.delete(connectionID)
-    clientRooms.delete(connectionID)
+function removeFromRoom(roomID : string, uid : string) {
+    rooms.get(roomID)?.delete(uid)
+    clientRooms.delete(uid)
 }

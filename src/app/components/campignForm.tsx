@@ -1,8 +1,8 @@
 import { campaign } from "../types";
 import { UUID } from "crypto";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
-import {socket} from "../socket"
+import { useSocket } from "./socketManager";
 
 interface campaignProps {
     campaign : campaign | undefined,
@@ -30,7 +30,8 @@ export default function CampignForm({ campaign,gm } : campaignProps) {
     const[title,setTitle]=useState("");
     const[description,setDescription]=useState("");
     const {status, user, logout} = useAuth();
-    
+    const socket = useSocket()
+
     const disabled = (campaign != undefined)
 
     return (
@@ -61,7 +62,7 @@ export default function CampignForm({ campaign,gm } : campaignProps) {
             }
             {disabled &&
             <button type="button" onClick={()=>{user!=null?
-                gm ? socket.emit("startSession", campaign.id, user.id) : socket.emit("joinSession", campaign.id, user.id) :
+                gm ? socket?.emit("startSession", campaign.id, user.id) : socket?.emit("joinSession", campaign.id, user.id) :
                 console.log("user je null iz nekog razloga kliknuto je dugme za sesiju");
                 console.log("Ide dugme za soket");
             }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : "Udji u sesiju"}</button>
