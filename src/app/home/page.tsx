@@ -45,9 +45,6 @@ const socket = useSocket()
 useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
 
     if (socket) {
-        socket.on("update", (campaign: s_campaign) => {
-            console.log(campaign)
-        })
         socket.on("redirect", (url) => {
             console.log("redirect")
             window.location.href = url

@@ -18,7 +18,7 @@ export default function Session() {
 
   useEffect(()=> {
     if (status === 'authenticated' && user && socket) {
-      socket.emit("updateRequest")
+      socket.emit("joinSession2")
       socket.on("update", (campaign : campaign) => {
         setState(campaign)
         let p = undefined
