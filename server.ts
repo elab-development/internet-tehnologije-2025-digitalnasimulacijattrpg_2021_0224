@@ -98,7 +98,7 @@ app.prepare().then(() => {
             console.log("\t> startSession:\n\t\tcampaignID:", campaignID, "\n\t\tdmID: ", dmID)
             if (sessions.has(campaignID)) {
                 //handle
-                socket.emit("redirect", "sessionGM/"+campaignID)
+                socket.emit("redirect", "session/"+campaignID)
                 return
             }
             const db_campaign: any[] = await db.select()
@@ -192,7 +192,7 @@ app.prepare().then(() => {
 
             sessions.set(campaignID, campaign)
             addToRoom(campaignID, connectionID)
-            socket.emit("redirect", "sessionGM/"+campaignID)
+            socket.emit("redirect", "session/"+campaignID)
             console.log("==============================")
         })
         socket.on("joinSession", (campaignID : UUID, playerID : UUID) => {

@@ -59,7 +59,8 @@ export default function Session() {
             ))}
             <button className="btnAddNote border font-bold hover:text-pink-500">dodaj belesku</button>
           </div>
-          <CharSheetDisplay cs={player?.charSheet} />
+          {player !== undefined 
+            && <CharSheetDisplay cs={player?.charSheet} />}
         </div>
       </div>
     </div>
