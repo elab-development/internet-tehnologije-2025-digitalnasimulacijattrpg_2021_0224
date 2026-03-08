@@ -45,9 +45,9 @@ export default function Session() {
           </div>
           <div className="documents">Dva kostura se dogovarajy djir na motoru</div>
           <div className="players flex flex-row justify-end bg-black gap-1" >
-            {state?.players.map((player)=>(
-              player.id !== user?.id
-              && <Player key={player.id} p={player}></Player>
+            {state?.players.map((pl)=>(
+              pl.id !== user?.id
+              && <Player key={pl.id} p={pl} dm={player?.id === state.gameMaster.id} />
             ))}
           </div>
         </div>
@@ -59,7 +59,7 @@ export default function Session() {
             ))}
             <button className="btnAddNote border font-bold hover:text-pink-500">dodaj belesku</button>
           </div>
-          <CharSheetDisplay cs={player?.charSheet}/>
+          <CharSheetDisplay cs={player?.charSheet} />
         </div>
       </div>
     </div>
