@@ -1,11 +1,11 @@
 import { createServer } from "node:http"
 import next from "next"
-import { Server } from "socket.io"
+import { Server, Socket } from "socket.io"
 import { db } from "./src/db/index.ts"
 import { campaignDocumentsTable, campaignPlayersCharSheetsTable, campaignPlayersTable, campaignsTable, charSheetsTable, documentsTable, notesTable, usersTable } from "./src/db/schema.ts"
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 
-type UUID = `${string}-${string}-${string}-${string}-${string}`
+type UUID = `${string}-${string}-${string}-${string}-${string}` | string
 
 const dev = process.env.NODE_ENV !== "production"
 const hostname = "localhost"
@@ -32,6 +32,7 @@ export type player = {
 export type DM = {
     id : string,
     username: string,
+    online: boolean
 }
 
 export type campaign = {
@@ -69,6 +70,12 @@ export type note = {
 }
 
 let sessions = new Map<UUID, campaign>()
+// btw ovaj DefaultEventsMap ne moze da se importuje i beskonacno ce davati error u kodu...
+// ... kompajlira se bez problema ...
+// ... ako se uradi import kompajliranje fejluje jer DefaultEventMap export ne postoji ...
+let clients = new Map<string, Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>>()
+let rooms = new Map<string, Set<string>> // campaignID, uid[]
+let clientRooms = new Map<string, string> // uid, campaignID
 
 app.prepare().then(() => {
     const httpServer = createServer(handler)
@@ -77,19 +84,22 @@ app.prepare().then(() => {
 
     io.on("connection", (socket) => {
 
+        const uid = socket.handshake.auth.uid
+        console.log("\t> soket konektovan, uid:", uid)
+        clients.set(uid, socket)
+
         // kada se user konektuje gleda se da li je u kampanji ili na homepage-u
         // - ako je na homepage-u salje mu se info o aktivnim kampanjama kojima se moze prikljuciti
         // - ako je u sesiji
         //      - verifikuje se da li sme da joj bude prikljucen
         //      - razmena podataka logika
 
-        console.log(socket.id + " connected")
         socket.on("startSession", async (campaignID : UUID, dmID : UUID) => {
-            console.log("\n\n\n==============================")
-            console.log("\t> startSession: campaignID:", campaignID, " dmID: ", dmID)
+            console.log("\n\n==============================")
+            console.log("\t> startSession:\n\t\tcampaignID:", campaignID, "\n\t\tdmID: ", dmID)
             if (sessions.has(campaignID)) {
                 //handle
-                socket.emit("redirect", "sessionGM/"+campaignID)
+                socket.emit("redirect", "session/"+campaignID)
                 return
             }
             const db_campaign: any[] = await db.select()
@@ -114,16 +124,23 @@ app.prepare().then(() => {
             const gm : DM = {
                 id : dmID,
                 username : db_gm[0].username,
+                online : false
             }
-            const db_players: any[] = await db.select()
+            const db_players = await db.select()
                 .from(campaignPlayersTable)
                 .innerJoin(usersTable, eq(campaignPlayersTable.player, usersTable.id))
                 .where(eq(campaignPlayersTable.capmaign, campaignID))
             let players: Array<player> = await Promise.all(
                 db_players.map(async row => {
                 const db_charSheet: any[] = await db.select()
-                    .from(campaignPlayersCharSheetsTable)
-                    .innerJoin(charSheetsTable, eq(campaignPlayersCharSheetsTable.campaign, campaignID) && eq(campaignPlayersCharSheetsTable.player, row.User.id))
+                    .from(charSheetsTable)
+                    .innerJoin(campaignPlayersCharSheetsTable, eq(charSheetsTable.id, campaignPlayersCharSheetsTable.charSheet))
+                    .where(
+                        and(
+                            eq(campaignPlayersCharSheetsTable.campaign, campaignID),
+                            eq(campaignPlayersCharSheetsTable.player, row.User.id)
+                        )
+                    )
                 const cs = db_charSheet[0].CharSheet
                 const db_notes: any[] = await db.select()
                     .from(notesTable)
@@ -176,55 +193,74 @@ app.prepare().then(() => {
             }
 
             sessions.set(campaignID, campaign)
-            socket.join(campaignID)
-            socket.emit("redirect", "sessionGM/"+campaignID)
-            io.to(campaignID).emit("update", sessions.get(campaignID))
-        })
-        socket.on("joinSession", (campaignID : UUID, playerID : UUID) => {
-            console.log("\t\t>join")
-            if (!sessions.has(campaignID)) {
-                console.log("\t\t> nema sesije")
-                // handle
-                return
-            }
-            let playerIndex = playerInCampaign(playerID, campaignID)
-            console.log("\t\t> " + playerIndex)
-            if (playerIndex == -1) {
-                // handle
-                return
-            }
-            console.log("\t> Session join request: \n\t\tcampaign: " + sessions.get(campaignID)?.name + "\n\t\tplayer: " + sessions.get(campaignID)?.players.at(playerIndex))
-            sessions.get(campaignID)!.players.at(playerIndex)!.online = true
-            for (let room in socket.rooms) {
-                removePlayerFromSession(playerIndex, room)
-                socket.leave(room)
-            }
-            socket.join(campaignID)
+            addToRoom(campaignID, uid)
             socket.emit("redirect", "session/"+campaignID)
-            io.to(campaignID).emit("update", sessions.get(campaignID))
-            console.log("\t> ", sessions.get(campaignID)?.players.at(playerIndex)?.username, " joined ", sessions.get(campaignID)?.name)
+            console.log("==============================")
         })
-        socket.on("leaveSession", (campaignID : UUID, playerID : UUID) => {
-            let playerIndex = playerInCampaign(playerID, campaignID)
-            if (playerIndex == -1) {
+        socket.on("joinSession", (campaignID : UUID, playerID : UUID) => { // BUG
+            console.log("\n\n==============================")
+            console.log("\t> joinSession:\n\t\tcampaignID:", campaignID, "\n\t\tplayerID: ", playerID)
+            if (!sessions.has(campaignID)) {
+                console.log("\t\t\t> kampanja nije aktivna")
                 // handle
                 return
             }
-            removePlayerFromSession(playerIndex, campaignID)
-            socket.leave(campaignID)
-            socket.emit("redirect", "/home")
-        })
-        socket.on("abortSession", (campaignID : UUID, gmID : UUID) => {
-            if (sessions.get(campaignID)?.gameMaster.id !== gmID) {
-                //handle
+            let playerIndex = playerInCampaign(playerID, campaignID)
+            if (playerIndex == -1) {
+                console.log("\t\t\t> igrac nije u kampanji")
+                // handle
                 return
             }
-            let socketIDs = io.sockets.adapter.rooms.get(campaignID)
-            for (let socketID in socketIDs) {
-                io.sockets.sockets.get(socketID)?.leave(campaignID)
-                socket.emit("redirect", "/home")
+            addToRoom(campaignID, uid)
+            socket.emit("redirect", "session/"+campaignID)
+            console.log("==============================")
+        })
+        socket.on("joinSession2", () => {
+            console.log("\n\n==============================")
+            console.log("\t> join session 2")
+            let campaignID = clientRooms.get(uid)!
+            if (sessions.get(campaignID)?.gameMaster.id !== uid) {
+                let playerIndex = playerInCampaign(uid, campaignID)
+                console.log("\n\t\tcampaign: " + sessions.get(campaignID)?.name + "\n\t\tplayer: " + sessions.get(campaignID)?.players.at(playerIndex)?.username)
+                sessions.get(campaignID)!.players.at(playerIndex)!.online = true
+                for (let room in rooms) {
+                    removePlayerFromSession(playerIndex, room)
+                    removeFromRoom(room, uid)
+                }
+                console.log("\t> ", sessions.get(campaignID)?.players.at(playerIndex)?.username, " joined ", sessions.get(campaignID)?.name)
+                console.log("\t> players in session:")
+                sessions.get(campaignID)?.players.forEach((player) => {
+                    console.log("\t\t", player.username)
+                })
+            } else {
+                sessions.get(campaignID)!.gameMaster.online = true
             }
-            sessions.delete(campaignID)
+            emitUpdate(campaignID)
+            console.log("==============================")
+            console.log("\t\t> update request")
+            clients.get(uid)?.emit("update", sessions.get(clientRooms.get(uid)!))
+        })
+        socket.on("disconnect", () => {
+            console.log("\n\n==============================")
+            console.log("\t> disconnect", uid)
+            if (!clientRooms.has(uid)) {
+                // handle
+                return
+            }
+            let sessionID = sessions.get(clientRooms.get(uid)!)?.id
+            let gm : DM = sessions.get(sessionID!)?.gameMaster!
+            if (gm.id === uid && gm.online) {
+                console.log("\t\t> abort session")
+                abortSession(sessionID!) // NE RADI
+            } else {
+                disconnectPlayer(uid)
+            }
+            console.log("==============================")
+        })
+
+        socket.on("SkillCheck", (playerID : string, value : number) => {
+            clients.get(playerID)?.emit("doSkillCheck", value)
+            // prikazi ostalima
         })
     })
 
@@ -239,11 +275,8 @@ app.prepare().then(() => {
 })
 
 function playerInCampaign(playerID : UUID, campaignID : UUID) {
-    // ja mrzim ovaj kod zasto ne mogu da uradim return kada nadjem ono sto sam trazio
-    // ZASTO RETURN LOMI PETLJU UMESTO DA GASI FUNKCIJU OVO JE NAJGORI JEZIK IKADA
     let indeks : number = -1
     sessions.get(campaignID)?.players.forEach((player, index) => {
-        console.log("\t\t\t> ",player.id, playerID)
         if (player.id === playerID) {
             indeks = index
         }
@@ -251,6 +284,63 @@ function playerInCampaign(playerID : UUID, campaignID : UUID) {
     return indeks
 }
 
-function removePlayerFromSession(playerIndex : number, room : any) {
-    sessions.get(room)!.players.at(playerIndex)!.online = false
+function removePlayerFromSession(playerIndex : number, campaignID : any) {
+    sessions.get(campaignID)!.players.at(playerIndex)!.online = false
+}
+
+function emitToRoom(roomID : string, event : string, ...args : any[]) {
+    rooms.get(roomID)?.forEach((uid) => {
+        clients.get(uid)?.emit(event, ...args)
+    })
+}
+
+function emitUpdate(roomID : string) {
+    const session = sessions.get(roomID)
+    console.log("\t> sending state update to", session?.name)
+    console.log("\t\tklijenti u sobi", rooms.get(roomID))
+    rooms.get(roomID)?.forEach((client) => {
+        clients.get(client)?.emit("update", session)
+        console.log("\t\tsent to", client)
+    })
+}
+
+function addToRoom(roomID : string, uid : string) {
+    if (!rooms.has(roomID)) {
+        rooms.set(roomID, new Set<string>())
+    }
+    rooms.get(roomID)?.add(uid)
+    clientRooms.set(uid, roomID)
+    console.log("\t> klijent", uid, "dodat u sobu", roomID)
+    console.log("\t\trooms", rooms)
+    console.log("\t\tclientRooms")
+}
+
+function removeFromRoom(roomID : string, uid : string) {
+    rooms.get(roomID)?.delete(uid)
+    clientRooms.delete(uid)
+}
+
+function disconnectPlayer(uid : string) {
+    let campaignID = clientRooms.get(uid)!
+    let playerIndex = playerInCampaign(uid, campaignID)
+    if (playerIndex == -1) {
+        // handle
+        return
+    }
+    if (!sessions.get(campaignID)?.players.at(playerIndex)?.online) {
+        return
+    }
+    removePlayerFromSession(playerIndex, campaignID)
+    removeFromRoom(campaignID, uid)
+    console.log("player removed", uid)
+    emitUpdate(campaignID)
+    console.log("==============================")
+}
+
+function abortSession(sessionID : string) {
+    emitToRoom(sessionID, "redirect", "/home")
+    sessions.get(sessionID)?.players.forEach((player) => {
+        disconnectPlayer(player.id)
+    })
+    sessions.delete(sessionID)
 }

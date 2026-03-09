@@ -2,7 +2,7 @@ import { campaign, charSheet } from "../types";
 import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 import { useAuth } from "./AuthProvider";
-import {socket} from "../socket"
+import { useSocket } from "./socketManager";
 import CharSheetForm from "./charSheetForm.tsx";
 import Container from "./Container.tsx";
 
@@ -74,9 +74,10 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
             throw new Error("Neuspesno dodat lik")
         }
     }
-    const[title,setTitle]=useState("");
-    const[description,setDescription]=useState("");
+    const [title,setTitle]=useState("");
+    const [description,setDescription]=useState("");
     const {status, user, logout} = useAuth();
+    const socket = useSocket()
     const [players,setPlayers]=useState<user[]>([]);
     const [toggleAddChar,setToggleAddChar]=useState<boolean>(false);
     const [invite,setInvite]=useState<boolean>(invited)
@@ -132,9 +133,9 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
             }
             {disabled &&
             <button type="button" onClick={()=>{user!=null?
-                gm ? socket.emit("startSession", campaign.id, user.id) :
+                gm ? socket?.emit("startSession", campaign.id, user.id) :
                 invite ? setToggleAddChar(true) : //OVDE IDE POPUP LOGIKA ZA KARAKTERE
-                 socket.emit("joinSession", campaign.id, user.id) :
+                 socket?.emit("joinSession", campaign.id, user.id) :
                 console.log("user je null iz nekog razloga kliknuto je dugme za sesiju");
             }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : invite ? "Dodaj karaktera" :"Udji u sesiju"}</button>
             }

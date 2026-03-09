@@ -1,56 +1,86 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { socket } from "../../socket"
-import Player from "../../components/Player" 
-
-import { useParams } from 'next/navigation'
-import { user } from "../../types"
+import { useSocket } from "../../components/socketManager"
+import Player from "../../components/session/Player" 
+import { campaign, player } from "../../../../server"
 import { useAuth } from "../../components/AuthProvider"
-import "./session.css"
+import CharSheetDisplay from "../../components/session/charSheetDisplay"
+import NoteDisplay from "../../components/session/noteDisplay"
+import { NavBar } from "../../components/navbar"
+
 export default function Session() {
   const {status, user, logout} = useAuth()
-  
-  const {sessionID} = useParams()
+  const socket = useSocket()
 
-  const [players, setPlayers] = useState(Array<user>)
-  const [playerSent, setPlayerSent] = useState(false)
+  const [state, setState] = useState<campaign>()
+  const [player, setPlayer] = useState<player | null>()
+  const [doSkillCheck, setDoSkillCheck] = useState<boolean>(false)
 
-    useEffect(()=> {
-      if (status === 'authenticated' && user && !playerSent) {
-        socket.emit("joinCampaign", sessionID)
-        socket.emit("player", user)
-        setPlayerSent(true)
-        socket.on("pisi", (msg) => {
-          console.log(msg)
+  useEffect(()=> {
+    if (status === 'authenticated' && user && socket) {
+      socket.emit("joinSession2")
+      socket.on("update", (campaign : campaign) => {
+        setState(campaign)
+        let p = undefined
+        campaign?.players.forEach((player) => {
+          console.log(player.id, user.id)
+          if (player.id == user.id) {
+            p = player
+            console.log(p)
+            return
+          }
         })
-        socket.on("updatePlayers", (players) => {
-          setPlayers(players)
-          console.log(players)
-        })
-      }
-    })
+        if (campaign.gameMaster.id === user.id) {
+          p = null
+        }
+        setPlayer(p)
+      })
+      socket.on("redirect", (url : string) => {
+        window.location.href = url
+      })
+      socket.on("doSkillCheck", () => {
+        setDoSkillCheck(true)
+      })
+    }
+  }, [status, user, socket])
 
-  console.log(players)
+  const handleSkillCkeckClick = (p : player, value : number) => {
+    socket?.emit("SkillCheck", p.id, value)
+  }
+
   return (
-  //   <div className="session p-1 border bt-0">
-  //     <div className="players flex flex-col p-1 gap-1">
-  //       {players.map((player)=>(<Player key={player.id} u={player} />))}
-  //     </div>
-  //   </div>
-  // )
-      <div className="layout">
-      <div className="levaStrana">
-        <div className="kampanja bg-blue-500 ">
-          <div className="naslov bg-white-500">sad ce da vidimo nesto</div>
+    <div className="page flex flex-col h-screen w-screen fixed">
+      <NavBar />
+      <div className="body flex flex-row h-full border border-t-0">
+        <div className="left flex flex-col justify-between w-3/4">
+          <div className="campaign bg-black">
+            <div className="naslov font-extrabold text-4xl text-center border border-r-0 p-2">{state?.name}</div>
+            <div className="opis border border-t-0 border-r-0 p-2 text-justify">{state?.description}</div>
+          </div>
+          <div className="documents">Dva kostura se dogovarajy djir na motoru</div>
+          <div className="players flex flex-row justify-end bg-black gap-1" >
+            {state?.players.map((pl)=>(
+              pl.id !== user?.id
+              && <Player key={pl.id} p={pl} dm={player === null} btnSkillCheck={handleSkillCkeckClick} />
+            ))}
+          </div>
         </div>
-        <div className="dokument bg-green-500">Dva kostura se dogovarajy djir na motoru</div>
-        <div className="listaIgraca bg-yellow-500" >GAMBATE</div>
-        </div>
-        <div className="sveDesno bg-red-500">
-          <div className="notes bg-pink-500">Zabeleske</div>
-          <div className="karakter bg-purple-500">Statistike o karakteru, kontam da moze da padne jedan CharSheetForm</div>
+        <div className="right border-l flex flex-col justify-between w-1/4">
+          <div className="notes flex flex-col gap-1 bg-black p-1 border">
+            <p className="font-bold text-center border">notes</p>
+            {player?.charSheet.notes.map((note) => (
+              <NoteDisplay key={note.id} n={note}/>
+            ))}
+            <button className="btnAddNote border font-bold
+              hover:text-pink-500
+              active:text-transparent"
+              onClick={()=>{}}>dodaj belesku</button>
+          </div>
+          {player !== null
+            && <CharSheetDisplay cs={player?.charSheet} />}
         </div>
       </div>
+    </div>
   )
 }

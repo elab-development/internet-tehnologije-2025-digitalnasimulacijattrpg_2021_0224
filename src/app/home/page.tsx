@@ -8,7 +8,7 @@ import { useAuth } from "../components/AuthProvider";
 import charSheetForm from "../components/charSheetForm";
 import CampignForm from '../components/campignForm';
 import CharSheetForm from '../components/charSheetForm';
-import { socket } from '../socket';
+import { useSocket } from '../components/socketManager';
 import { campaign as s_campaign } from '../../../server';
 
 function Home(){
@@ -40,13 +40,16 @@ function Home(){
     }
 
 const {status, user, logout} = useAuth()//kfndklfnsfklnds
+const socket = useSocket()
 const [toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
 
 useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektuje na potrebnu stranicu
-    socket.on("redirect", (url) => {
-        console.log("redirect")
-        window.location.href = url
-    })
+    if (socket) {
+        socket.on("redirect", (url) => {
+            console.log("redirect")
+            window.location.href = url
+        })
+    }
 
   if (status === "authenticated" && user?.id) {
     fetchCampaigns(user.id)
@@ -70,7 +73,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektu
       .catch(err => {
       });
     }
-    }, [status, user?.id,toggleCampaginForm]);
+    }, [status, user?.id,toggleCampaginForm, socket]);
 
     const [toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
 
