@@ -1,6 +1,8 @@
 import { db } from '../../../db';
-import { campaignPlayersCharSheetsTable } from '../../../db/schema';
+import { campaignPlayersTable } from '../../../db/schema';
 import { NextResponse } from 'next/server';
+import { eq } from "drizzle-orm";
+
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -18,14 +20,17 @@ export async function POST(req:Request) {
     try{
     if(req.method!=="POST"){
         console.log("nije trazen dobar metod");
-        return NextResponse.json({error:"Nedobar metod, nije POST"},{status:405});
+        return NextResponse.json({error:"Nedobar metod, nije DELETE"},{status:405});
     }
-    const {campaginid,playerid,sheetId}=await req.json();
-    if(!sheetId||!campaginid||!playerid){
-        return NextResponse.json({error:"Nedobro popunjeno"},{status:400});
+    
+    const { searchParams } = new URL(req.url);
+    const playerId = searchParams.get("playerId");
+    const campaignId=searchParams.get("campaginId")
+    if(!playerId||!campaignId){
+        return NextResponse.json({error:"Nisu nadjeni atributi"},{status:400})
     }
-    const [newCharSheet]=await db.insert(campaignPlayersCharSheetsTable).values({campaign:campaginid,player:playerid,charSheet:sheetId}).returning();
-    return NextResponse.json(newCharSheet,{status:201});
+    await db.insert(campaignPlayersTable).values({capmaign:campaignId,player:playerId})
+    return NextResponse.json({success: true})
     }
     catch(err){
         console.log("UPOMOC POSLEDNJI CATCH JE IZASAO AAAAAa");

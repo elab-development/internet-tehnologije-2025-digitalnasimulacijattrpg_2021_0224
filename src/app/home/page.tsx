@@ -161,7 +161,6 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektu
                 }
                 gm={!!campainList.find(cm => cm.id === clickedCampagin)}
                 invited={!!campainInvite.find(cm=>cm.id===clickedCampagin)}
-                //OVDWE MORA DA SE RIRENDERUJE HOME KADA LIK UNESE KARAKTERA
                 ></CampignForm>
             
 
