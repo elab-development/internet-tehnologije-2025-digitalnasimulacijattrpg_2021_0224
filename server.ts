@@ -257,6 +257,11 @@ app.prepare().then(() => {
             }
             console.log("==============================")
         })
+
+        socket.on("SkillCheck", (playerID : string, value : number) => {
+            clients.get(playerID)?.emit("doSkillCheck", value)
+            // prikazi ostalima
+        })
     })
 
     httpServer

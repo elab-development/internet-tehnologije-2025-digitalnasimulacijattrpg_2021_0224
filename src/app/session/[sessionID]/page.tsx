@@ -15,6 +15,7 @@ export default function Session() {
 
   const [state, setState] = useState<campaign>()
   const [player, setPlayer] = useState<player | null>()
+  const [doSkillCheck, setDoSkillCheck] = useState<boolean>(false)
 
   useEffect(()=> {
     if (status === 'authenticated' && user && socket) {
@@ -38,11 +39,14 @@ export default function Session() {
       socket.on("redirect", (url : string) => {
         window.location.href = url
       })
+      socket.on("doSkillCheck", () => {
+        setDoSkillCheck(true)
+      })
     }
   }, [status, user, socket])
 
-  const handleSkillCkeckClick = (p : player) => {
-    socket?.emit("SkillCheck", p)
+  const handleSkillCkeckClick = (p : player, value : number) => {
+    socket?.emit("SkillCheck", p.id, value)
   }
 
   return (

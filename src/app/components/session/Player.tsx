@@ -7,7 +7,7 @@ import Kockice from "../kockice";
 interface playerProps {
     p: player,
     dm: boolean,
-    btnSkillCheck : (p : player) => void
+    btnSkillCheck : (p : player, value : number) => void
 }
 
 
@@ -27,7 +27,7 @@ export default function Player({p, dm, btnSkillCheck} : playerProps) {
                 active:text-transparent"
                 onClick={()=>{
                     setShowCharSheet(!showCharSheet)
-                    btnSkillCheck(p)
+                    btnSkillCheck(p, 8) // implementiraj da gm daje value
                 }}
             >Skill Check!</button>}</>
         )
