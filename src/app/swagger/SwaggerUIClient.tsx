@@ -1,0 +1,8 @@
+"use client"; // OBLIGATORNO
+
+import SwaggerUI from "swagger-ui-react";
+import "swagger-ui-react/swagger-ui.css";
+
+export default function SwaggerUIClient() {
+  return <SwaggerUI url="/openapi.json" />;
+}
