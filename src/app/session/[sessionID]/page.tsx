@@ -35,6 +35,9 @@ export default function Session() {
         }
         setPlayer(p)
       })
+      socket.on("redirect", (url : string) => {
+        window.location.href = url
+      })
     }
   }, [status, user, socket])
 

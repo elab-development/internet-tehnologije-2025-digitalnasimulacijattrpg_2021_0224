@@ -32,6 +32,7 @@ export type player = {
 export type DM = {
     id : string,
     username: string,
+    online: boolean
 }
 
 export type campaign = {
@@ -123,6 +124,7 @@ app.prepare().then(() => {
             const gm : DM = {
                 id : dmID,
                 username : db_gm[0].username,
+                online : false
             }
             const db_players = await db.select()
                 .from(campaignPlayersTable)
@@ -230,6 +232,8 @@ app.prepare().then(() => {
                 sessions.get(campaignID)?.players.forEach((player) => {
                     console.log("\t\t", player.username)
                 })
+            } else {
+                sessions.get(campaignID)!.gameMaster.online = true
             }
             emitUpdate(campaignID)
             console.log("==============================")
@@ -237,16 +241,21 @@ app.prepare().then(() => {
             clients.get(uid)?.emit("update", sessions.get(clientRooms.get(uid)!))
         })
         socket.on("disconnect", () => {
+            console.log("\n\n==============================")
+            console.log("\t> disconnect", uid)
             if (!clientRooms.has(uid)) {
                 // handle
                 return
             }
             let sessionID = sessions.get(clientRooms.get(uid)!)?.id
-            if (sessionID === uid) {
+            let gm : DM = sessions.get(sessionID!)?.gameMaster!
+            if (gm.id === uid && gm.online) {
+                console.log("\t\t> abort session")
                 abortSession(sessionID!) // NE RADI
             } else {
                 disconnectPlayer(uid)
             }
+            console.log("==============================")
         })
     })
 
@@ -286,7 +295,7 @@ function emitUpdate(roomID : string) {
     console.log("\t\tklijenti u sobi", rooms.get(roomID))
     rooms.get(roomID)?.forEach((client) => {
         clients.get(client)?.emit("update", session)
-        console.log("\t\tsent to ", client)
+        console.log("\t\tsent to", client)
     })
 }
 
@@ -318,15 +327,15 @@ function disconnectPlayer(uid : string) {
     }
     removePlayerFromSession(playerIndex, campaignID)
     removeFromRoom(campaignID, uid)
-    console.log("player removed")
+    console.log("player removed", uid)
     emitUpdate(campaignID)
     console.log("==============================")
 }
 
 function abortSession(sessionID : string) {
+    emitToRoom(sessionID, "redirect", "/home")
     sessions.get(sessionID)?.players.forEach((player) => {
         disconnectPlayer(player.id)
     })
-    emitToRoom(sessionID, "redirect", "/home")
     sessions.delete(sessionID)
 }
