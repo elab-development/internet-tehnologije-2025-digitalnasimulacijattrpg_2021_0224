@@ -40,6 +40,7 @@ function Home(){
     }
 
 const {status, user, logout} = useAuth()//kfndklfnsfklnds
+const [toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
 
 useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektuje na potrebnu stranicu
     socket.on("redirect", (url) => {
@@ -69,9 +70,8 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektu
       .catch(err => {
       });
     }
-    }, [status, user?.id]);
+    }, [status, user?.id,toggleCampaginForm]);
 
-    const [toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
     const [toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
 
     const [csList,setCsList]=useState<charSheet[]>([]);//lista charSheet
@@ -81,6 +81,8 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektu
 
     const [clickedCharSheet,setClickedCharSheet]=useState<UUID | undefined>(undefined);//KLIKNUT KARAKTER
     const [clickedCampagin,setClickedCampagin]=useState<UUID | undefined>(undefined);//KLIKNUTA KAMPANJA
+
+    
  
     function handleCampainOnClick(id:UUID){
         setToggleCampaginForm(true);
@@ -159,6 +161,7 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektu
                 }
                 gm={!!campainList.find(cm => cm.id === clickedCampagin)}
                 invited={!!campainInvite.find(cm=>cm.id===clickedCampagin)}
+                //OVDWE MORA DA SE RIRENDERUJE HOME KADA LIK UNESE KARAKTERA
                 ></CampignForm>
             
 

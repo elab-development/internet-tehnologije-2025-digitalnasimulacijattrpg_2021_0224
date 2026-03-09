@@ -41,8 +41,7 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
 
         return res.json();
     }
-    async function killPlayer(playerId:UUID){
-        //ukloni igraca iz kampanje, cp i cps
+    async function killPlayer(playerId:UUID){//uklanja igraca sa sesije
         const res=await fetch(`/api/removePlayer?playerId=${playerId}`, {
         credentials: "include",
         method:"DELETE"
@@ -50,15 +49,6 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
         });
         if(!res.ok){
             throw new Error("Neuspesno uklonjen igrac iz kampanje")
-        }
-    }
-    async function getCharSheets(){//uzima karaktere za dodeljivanje karaktera kampanji
-        const res = await fetch(`/api/charSheets?userId=${user}`,{
-            credentials:"include",
-            method:"GET"
-        })
-        if(!res.ok){
-            throw new Error("Neuspesno izvuceni karakteri")
         }
     }
     type user={
@@ -122,7 +112,7 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
                 console.log("user je null iz nekog razloga kliknuto je dugme za sesiju");
             }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : invite ? "Dodaj karaktera" :"Udji u sesiju"}</button>
             }
-            {disabled && toggleAddChar &&
+            {disabled && 
                 <div className="flex flex-col w-fit">
                     {players.length===0 ? <p>Kampanja nema igraca</p>:
                     players.map((player)=>(
@@ -186,13 +176,8 @@ function FreeChar({user,campaginId,onClick}:freeCharProps){
     },[])
     const [sheets,setSheets]=useState<charSheet[]>([])
     const [selectedSheet,setSelectedSheet]=useState<charSheet>()
-    const [toggle,setToggle]=useState<boolean>(true)
-    
-    // function handleSheetClick(sheet:charSheet){
-    //     setToggleForm(true)
-    //     setSelectedSheet(sheet)
+    const [toggle,setToggle]=useState<boolean>(true)    
 
-    // }
     useEffect(()=>{
         if(selectedSheet){
             selectSheet(selectedSheet.id)
