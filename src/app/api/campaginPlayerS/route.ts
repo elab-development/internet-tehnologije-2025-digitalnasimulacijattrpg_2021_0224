@@ -1,5 +1,5 @@
 import { db } from "../../../db";
-import {campaignsTable,campaignPlayersTable } from '../../../db/schema';
+import {campaignsTable,campaignPlayersTable,campaignPlayersCharSheetsTable } from '../../../db/schema';
 import { eq } from "drizzle-orm";
 import { NextResponse } from 'next/server';
 import { campaign } from "../../types";
@@ -33,7 +33,7 @@ export async function GET(req:Request) {
     }
         try{
             const campP:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersTable,eq(campaignPlayersTable.capmaign,campaignsTable.id)).where(eq(campaignPlayersTable.player,userId));
-            const res= campP.map(row=>{
+            let cp= campP.map(row=>{
             return{   
                 id : row.Campaign.id,
                 name : row.Campaign.name,
@@ -42,7 +42,18 @@ export async function GET(req:Request) {
                 gameMaster : row.Campaign.gameMaster,
            
             }});
-            return NextResponse.json(res, { status: 200 });
+            const campPS:any[]=await db.select().from(campaignsTable).innerJoin(campaignPlayersCharSheetsTable,eq(campaignPlayersCharSheetsTable.campaign,campaignsTable.id)).where(eq(campaignPlayersCharSheetsTable.player,userId));
+            const cps=campPS.map(row=>{
+                return{
+                    id: row.Campaign.id,
+                    name: row.Campaign.name,
+                    description : row.Campaign.description,
+                    dateStart : row.Campaign.dateStart,
+                    gameMaster : row.Campaign.gameMaster,
+                }
+            })
+            cp=cp.filter(item=>!cps.some(c=>c.id===item.id));
+            return NextResponse.json({cp,cps}, { status: 200 });
         }catch(err){
             console.log("Problem s bazom pri prikupljanju kampanja");
             throw new Error("poslednji catch u route!!");

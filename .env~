@@ -3,3 +3,4 @@ API_URL=https://localhost:3000
 JWT_SECRET=tajna
 JWT_EXPIRES=1011d
 MAGICNIBROJ=magija
+YOUTUBE_API_KEY=yt_kljuc
