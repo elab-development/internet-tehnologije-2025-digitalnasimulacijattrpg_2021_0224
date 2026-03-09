@@ -1,5 +1,6 @@
+import next from 'next'
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
 
 const allowedOrigins = ["http://localhost:3000"]
 
@@ -26,17 +27,23 @@ export function proxy(request: NextRequest) {
   }
 
   
-  if (origin && !allowedOrigins.includes(origin)) {
-    return new NextResponse("CORS blocked", { status: 403 })
-  }
-
-  if (request.nextUrl.pathname.startsWith("/home")) {
+    if (request.nextUrl.pathname.startsWith("/home")) {
     if (!request.cookies.has("auth")) {
       return NextResponse.redirect(new URL("/", request.url))
     }
   }
 
+  if (origin == null){
+   return new NextResponse("No origin header: CORS blocked", { status: 400 }) 
+  }
+
+   if (origin || !allowedOrigins.includes(origin)) {
+    return new NextResponse("CORS blocked", { status: 403 })
+  }
+
   
+
+
   const response = NextResponse.next()
   if (origin && allowedOrigins.includes(origin)) {
     response.headers.set("Access-Control-Allow-Origin", origin)
