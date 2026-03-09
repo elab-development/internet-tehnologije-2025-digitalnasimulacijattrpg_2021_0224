@@ -51,9 +51,28 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
             throw new Error("Neuspesno uklonjen igrac iz kampanje")
         }
     }
+    async function fetchSviOstali(){
+        const res=await fetch(`/api/showUssers?userId=${user?.id}&campaginId=${campaign?.id}`,{
+            credentials:"include",
+            method:"GET"
+        })
+        if(!res.ok){
+            throw new Error("Neuspesno uzeti svi ostali")
+        }
+        return res.json()
+    }
     type user={
         id:UUID,
         username:string
+    }
+    async function addPlayer(player:UUID){
+        const res =await fetch(`/api/addPlayer?playerId=${player}&campaginId=${campaign?.id}`,{
+            credentials:"include",
+            method:"POST"
+        })
+        if(!res.ok){
+            throw new Error("Neuspesno dodat lik")
+        }
     }
     const[title,setTitle]=useState("");
     const[description,setDescription]=useState("");
@@ -61,10 +80,12 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
     const [players,setPlayers]=useState<user[]>([]);
     const [toggleAddChar,setToggleAddChar]=useState<boolean>(false);
     const [invite,setInvite]=useState<boolean>(invited)
+    const [showUssers,setShowUssers]=useState<boolean>(false)
+    const [ee,setee]=useState<user[]>([])
     
     const disabled = (campaign != undefined)
 
-    useEffect(()=>{
+    useEffect(()=>{//radi jebeno BESKONACNO
         if(status==="authenticated"&&user!=null){
         if(disabled){
         fetchLjudi()
@@ -73,8 +94,13 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
       })
       .catch(err => {
       });
+      fetchSviOstali().then(data=>{setee(data)}).catch(err=>{})
         }
+
+        
     }
+
+
     },[invite])
 
     return (
@@ -118,16 +144,26 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
                     players.map((player)=>(
                         <div
                          key={player.id}>{player.username}
-                        {gm && (<button className="border mt-2 w-1/2 hover:bg-pink-500" onClick={()=>{killPlayer(player.id)}}>Zakolji svinje sekirom ga ubij</button>)}
+                        {gm && (<button className="border mt-2 w-1/2 hover:bg-pink-500 " onClick={()=>{killPlayer(player.id);setInvite(invite)}}>Izbaci</button>)}
                          </div>
                          
                     ))
                     }
                 </div>
             }
-            {(disabled && gm) &&
-            <button className="border mt-2 w-1/2 hover:bg-pink-500">Dodaj igraca</button>
+            {(disabled && gm &&!showUssers) &&
+            <button className="border mt-2 w-1/2 hover:bg-pink-500" onClick={()=>setShowUssers(true)}>Dodaj igraca</button>
             // ovde se dodaje igrac
+
+            }
+            {showUssers && 
+                <div className="listaIgracaSVIH">
+                    {ee.length!=0 &&
+                        ee.map((lik)=>(
+                            <div onClick={()=>{setPlayers([lik,...players]);setShowUssers(false);addPlayer(lik.id);setInvite(invite);setee(ee.filter(a=>(a.id!=lik.id)))}} key={lik.id}>{lik.username}</div>
+                        ))
+                    }
+                </div>
             }
             {toggleAddChar && (<FreeChar onClick={()=>{setToggleAddChar(false);setInvite(false)}}campaginId={campaign} user={user?.id}/>)}
 
