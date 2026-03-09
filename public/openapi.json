@@ -1,0 +1,156 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Digitalna Simulacija TRPG API",
+    "version": "1.0.0",
+    "description": "Swagger spec za ceo API folder projekta"
+  },
+  "paths": {
+    "/api/register": {
+      "post": {
+        "summary": "Registracija korisnika",
+        "description": "Kreira novog korisnika sa username i password, vraća token u cookie",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username","password","confirmPassword"],
+                "properties": {
+                  "username": {"type": "string","example": "john_doe"},
+                  "password": {"type": "string","format": "password","example": "123456"},
+                  "confirmPassword": {"type": "string","format": "password","example": "123456"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Uspesna registracija",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/User"}
+              }
+            }
+          },
+          "400": {
+            "description": "Lozinke se ne poklapaju ili username vec postoji",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/log-in": {
+      "post": {
+        "summary": "Prijava korisnika",
+        "description": "Autentifikacija korisnika, vraća token u cookie",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username","password"],
+                "properties": {
+                  "username":{"type":"string","example":"john_doe"},
+                  "password":{"type":"string","format":"password","example":"123456"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200":{"description":"Uspesna prijava","content":{"application/json":{"schema":{"$ref":"#/components/schemas/User"}}}},
+          "400":{"description":"Greska u unosu","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},
+          "401":{"description":"Neuspesna autentifikacija","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}}
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "Odjava korisnika",
+        "description": "Briše autentifikacioni cookie",
+        "responses": {
+          "200":{"description":"Uspesna odjava","content":{"application/json":{"schema":{"type":"object","properties":{"message":{"type":"string","example":"Odjavljen"}}}}}}
+        }
+      }
+    },
+    "/api/campaignGMDocuments": {
+      "get": {
+        "summary": "Dohvati listu dokumenata",
+        "parameters": [
+          {"name":"id","in":"query","schema":{"type":"string"},"required":false}
+        ],
+        "responses": {
+          "200":{"description":"Lista dokumenata","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Document"}}}}},
+          "403":{"description":"CORS blocked","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},
+          "500":{"description":"Server error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}}
+        }
+      },
+      "post": {
+        "summary":"Upload fajla",
+        "requestBody":{
+          "required":true,
+          "content":{
+            "multipart/form-data":{
+              "schema":{
+                "type":"object",
+                "properties":{
+                  "file":{"type":"string","format":"binary"}
+                }
+              }
+            }
+          }
+        },
+        "responses":{
+          "200":{"description":"Fajl uploadovan","content":{"application/json":{"schema":{"type":"object","properties":{"message":{"type":"string","example":"File uploaded successfully"}}}}}},
+          "400":{"description":"Bad request","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}},
+          "500":{"description":"Server error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}}
+        }
+      }
+    },
+    "/api/charSheets": {
+      "get": {
+        "summary":"Dohvati listu character sheets",
+        "responses":{
+          "200":{"description":"Lista char sheets","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/CharSheet"}}}}},
+          "500":{"description":"Server error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}}
+        }
+      },
+      "post": {
+        "summary":"Kreiraj char sheet",
+        "requestBody":{
+          "required":true,
+          "content":{"application/json":{"schema":{"$ref":"#/components/schemas/CharSheet"}}}
+        },
+        "responses":{
+          "200":{"description":"Char sheet kreiran","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CharSheet"}}}},
+          "400":{"description":"Bad request","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ErrorResponse"}}}}
+        }
+      }
+    }
+    
+  },
+  "components":{
+    "schemas":{
+      "User":{"type":"object","properties":{"id":{"type":"integer","example":1},"username":{"type":"string","example":"john_doe"}}},
+      "Document":{"type":"object","properties":{"name":{"type":"string","example":"file.png"},"type":{"type":"string","example":"png"},"filepath":{"type":"string","example":"/documents/file.png"}}},
+      "CharSheet":{"type":"object","properties":{"id":{"type":"integer","example":1},"name":{"type":"string","example":"Hero"},"level":{"type":"integer","example":5}}}, 
+      "ErrorResponse":{"type":"object","properties":{"error":{"type":"string","example":"Nesto nije uredu"}}}
+    }
+  }
+}

@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const token = signAuthToken({ userID: u.id, username: u.username})
 
     
-    const res = NextResponse.json({ id: u.id, username: u.username })
+    const res = NextResponse.json({ id: u.id, username: u.username }, {status: 200})
     res.cookies.set(AUTH_COOKIE, token, cookieOptions())
 
     return res;
