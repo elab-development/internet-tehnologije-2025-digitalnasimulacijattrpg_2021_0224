@@ -26,22 +26,18 @@ export function proxy(request: NextRequest) {
     return res
   }
 
+
+   if (origin && !allowedOrigins.includes(origin)) {
+    return new NextResponse("CORS blocked", { status: 403 })
+  }
+
+
   
     if (request.nextUrl.pathname.startsWith("/home")) {
     if (!request.cookies.has("auth")) {
       return NextResponse.redirect(new URL("/", request.url))
     }
-  }
-
-  if (origin == null){
-   return new NextResponse("No origin header: CORS blocked", { status: 400 }) 
-  }
-
-   if (origin || !allowedOrigins.includes(origin)) {
-    return new NextResponse("CORS blocked", { status: 403 })
-  }
-
-  
+  }  
 
 
   const response = NextResponse.next()
