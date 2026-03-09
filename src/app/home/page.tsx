@@ -31,7 +31,7 @@ function Home(){
         }
         return res.json();
     }
-    async function fetchJoinedCampaigns(userId: string): Promise<campaign[]>{
+    async function fetchJoinedCampaigns(userId: string): Promise<{cp:campaign[],cps:campaign[]}>{
         const res=await fetch(`/api/campaginPlayerS?userId=${userId}`,{credentials:"include"});
         if(!res.ok){
             throw new Error("Fetch failed playerCampagin");
@@ -40,12 +40,9 @@ function Home(){
     }
 
 const {status, user, logout} = useAuth()//kfndklfnsfklnds
+const [toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
 
-useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
-
-    socket.on("update", (campaign: s_campaign) => {
-        console.log(campaign)
-    })
+useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje i redirektuje na potrebnu stranicu
     socket.on("redirect", (url) => {
         console.log("redirect")
         window.location.href = url
@@ -65,20 +62,27 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
       });
       fetchJoinedCampaigns(user.id)
         .then(data => {
-        setCampainJoinList(data);
+        const cp:campaign[]=data.cp;
+        const cps:campaign[]=data.cps;
+        setCampainJoinList(cps);
+        setCampainInvite(cp);
       })
       .catch(err => {
       });
     }
-    }, [status, user?.id]);
+    }, [status, user?.id,toggleCampaginForm]);
 
-    const[toggleCampaginForm,setToggleCampaginForm]=useState<boolean>(false);
-    const[toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
+    const [toggleCharSheetForm,setToggleCharSheetForm]=useState<boolean>(false);
+
     const [csList,setCsList]=useState<charSheet[]>([]);//lista charSheet
     const [campainList,setCampainList]=useState<campaign[]>([]);//lista kampanja gde je game master
     const [campainJoinList,setCampainJoinList]=useState<campaign[]>([]);//lista kampanja gde je dzoinovan
+    const [campainInvite,setCampainInvite]=useState<campaign[]>([]);
+
     const [clickedCharSheet,setClickedCharSheet]=useState<UUID | undefined>(undefined);//KLIKNUT KARAKTER
     const [clickedCampagin,setClickedCampagin]=useState<UUID | undefined>(undefined);//KLIKNUTA KAMPANJA
+
+    
  
     function handleCampainOnClick(id:UUID){
         setToggleCampaginForm(true);
@@ -105,12 +109,19 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
             <div className='stvarcine'>
                 <div className='stvari'>
                     <h4 className='naslov bg-gray-500 rounded-[95%_/_50%] p-3'>Lista dzoinovanih kampanja</h4>
-                    {campainJoinList.length===0 ?
+                    {(campainJoinList.length===0 ) ?
+                    // Vrlo verovatno postoji tautoloski problem
                     (<p className='komentar'>Nema aktivnih kamanja</p>) :
                     campainJoinList.map((container)=>(
                         <Container key={container.id} id={container.id} name={container.name} onClick={()=>{handleCampainOnClick(container.id)}}></Container>
                     ))
                     }
+                    {campainInvite.length===0?
+                    <p className='komentar'>Nema kampanja za Join</p>:
+                    campainInvite.map((container)=>(
+                        <Container key={container.id} id={container.id} name={container.name} onClick={()=>{handleCampainOnClick(container.id)}}></Container>
+                    ))}
+
                 </div>
                 <button className='btn hover:text-pink-500 active:text-transparent'>Nemam pojma neki join idk</button>
             </div>
@@ -143,21 +154,23 @@ useEffect(() => {//regulise uzimanje iz baze za karaktere i kampanje
                 <button className='btn hover:text-pink-500 active:text-transparent' onClick={()=>handleAddCs()}>Kreiraj NOVOG lika</button>
             </div>
             </div>
-              {toggleCampaginForm ? (<div className='forma'>
+              {toggleCampaginForm && (<div className='forma'>
                 <button onClick={()=>{setToggleCampaginForm(false)}} className='btn_forma'>Close</button>
                 <CampignForm campaign={
-                    campainList.find(cm=>cm.id===clickedCampagin) || campainJoinList.find(cm=>cm.id===clickedCampagin)
+                    campainList.find(cm=>cm.id===clickedCampagin) || campainJoinList.find(cm=>cm.id===clickedCampagin)||campainInvite.find(cm=>cm.id===clickedCampagin)//najverovatnije mora da se menja kod
                 }
                 gm={!!campainList.find(cm => cm.id === clickedCampagin)}
+                invited={!!campainInvite.find(cm=>cm.id===clickedCampagin)}
+                //OVDWE MORA DA SE RIRENDERUJE HOME KADA LIK UNESE KARAKTERA
                 ></CampignForm>
             
 
-        </div>):(<div></div>)}
-        {toggleCharSheetForm ? (<div className='forma'>
+        </div>)}
+        {toggleCharSheetForm && (<div className='forma'>
             <button onClick={()=>{setToggleCharSheetForm(false)}} className='btn_forma'>Close</button>
             <CharSheetForm char={csList.find(cs=>cs.id===clickedCharSheet)
             }></CharSheetForm>
-        </div>):(<div></div>)}
+        </div>)}
         </div>
  
         </>

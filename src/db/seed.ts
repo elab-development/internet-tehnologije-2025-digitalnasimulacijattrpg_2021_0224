@@ -101,6 +101,24 @@ await db.transaction(async (tx) => {
                 name : "Nikola prica gluposti",
                 description:"Nikola je poslednji covek koji je video cepanje raja, nazalost to mu je dalo slog. Sada je krenuo da prica totalno ne povezane stvari. MEdjutim Gajaka je nasao patern u njihovim dijalozima i skontao je da je moguca konverzacija s njim. Saznaj sta je Nikola video s druge strane nebeskih zavesa!",
                 gameMaster : "00000000-0000-0000-0000-000000000000"
+        },
+        {
+            id : "00000000-0000-0000-0000-500000000000",
+                name : "Aleksa radi stvai",
+                description:"Aleksa je prso nacisto je prso",
+                gameMaster : "00000000-0000-0000-0000-000000000000"
+        },
+        {
+            id : "00000000-0000-0000-0000-600000000000",
+                name : "Ognjen nije dobro",
+                description:"Ognjen zove upomoc pomozi mu",
+                gameMaster : "00000000-0000-0000-0000-000000000001"
+        },
+        {
+            id : "00000000-0000-0000-0000-700000000000",
+                name : "Ognjjen jeca",
+                description:"sada se i uplakao, trazi nitroglicerin",
+                gameMaster : "00000000-0000-0000-0000-000000000001"
         }
         
     ]).onConflictDoNothing();
@@ -119,6 +137,23 @@ await db.transaction(async (tx) => {
             capmaign: "00000000-0000-0000-0000-100000000000",
             player: "00000000-0000-0000-0000-000000000001"
         },
+        {
+            capmaign: "00000000-0000-0000-0000-100000000000",
+            player: "00000000-0000-0000-0000-000000000000"
+        },
+        {
+            capmaign: "00000000-0000-0000-0000-500000000000",
+            player: "00000000-0000-0000-0000-000000000003"          
+        },
+        {
+            capmaign: "00000000-0000-0000-0000-600000000000",
+            player: "00000000-0000-0000-0000-000000000003"
+        },
+        {
+            capmaign: "00000000-0000-0000-0000-700000000000",
+            player: "00000000-0000-0000-0000-000000000003"
+        }
+        
     ]).onConflictDoNothing();
 });
 await db.transaction(async (tx) => {
@@ -128,6 +163,11 @@ await db.transaction(async (tx) => {
             player: "00000000-0000-0000-0000-000000000001",
             charSheet:"00000000-0000-0000-0000-00000000000d"
         },
+        {
+            campaign:"00000000-0000-0000-0000-400000000000",
+            player:"00000000-0000-0000-0000-000000000003",
+            charSheet:"00000000-0000-0000-0000-00000000000c"
+        }
     ]).onConflictDoNothing();
 });
 

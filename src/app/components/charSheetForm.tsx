@@ -72,7 +72,6 @@ export default function CharSheetForm({ char } : charSheetProps) {
             {!disabled &&
             <button onClick={()=>{
                 if(user!=null){
-                console.log(name,str,dex,will,armor,hp,currency,user);
                 createNewCharSheet(name,+str,+dex,+will,+armor,+hp,+currency,user.id);
                 }else{
                     console.log("user je iz nekog razloga null");
