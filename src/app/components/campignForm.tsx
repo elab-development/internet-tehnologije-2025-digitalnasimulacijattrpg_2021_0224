@@ -68,7 +68,9 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
     const[title,setTitle]=useState("");
     const[description,setDescription]=useState("");
     const {status, user, logout} = useAuth();
-    const [players,setPlayers]=useState<user[]>([])
+    const [players,setPlayers]=useState<user[]>([]);
+    const [toggleAddChar,setToggleAddChar]=useState<boolean>(false);
+    const [invite,setInvite]=useState<boolean>(invited)
     
     const disabled = (campaign != undefined)
 
@@ -83,7 +85,7 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
       });
         }
     }
-    },[])
+    },[invite])
 
     return (
         <form className="flex flex-col w-full max-w-md mx-auto gap-3">
@@ -115,12 +117,12 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
             {disabled &&
             <button type="button" onClick={()=>{user!=null?
                 gm ? socket.emit("startSession", campaign.id, user.id) :
-                invited ? console.log("ovde radim popup za karaktere koji se prikazuju") :
+                invite ? setToggleAddChar(true) : //OVDE IDE POPUP LOGIKA ZA KARAKTERE
                  socket.emit("joinSession", campaign.id, user.id) :
                 console.log("user je null iz nekog razloga kliknuto je dugme za sesiju");
-            }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : invited ? "Dodaj karaktera" :"Udji u sesiju"}</button>
+            }} className="border mt-2 w-1/2 hover:bg-pink-500">{gm ? "Pokreni Sesiju" : invite ? "Dodaj karaktera" :"Udji u sesiju"}</button>
             }
-            {disabled &&
+            {disabled && toggleAddChar &&
                 <div className="flex flex-col w-fit">
                     {players.length===0 ? <p>Kampanja nema igraca</p>:
                     players.map((player)=>(
@@ -137,16 +139,24 @@ export default function CampignForm({ campaign,gm,invited } : campaignProps) {
             <button className="border mt-2 w-1/2 hover:bg-pink-500">Dodaj igraca</button>
             // ovde se dodaje igrac
             }
-            <div>Najverovatnije ovde ide popup</div>
+            {toggleAddChar && (<FreeChar onClick={()=>{setToggleAddChar(false);setInvite(false)}}campaginId={campaign} user={user?.id}/>)}
+
+            
         </form>
     )
 }
 
-function FreeChar(user:UUID){
+type freeCharProps={
+    user:UUID|undefined
+    campaginId:campaign|undefined
+    onClick: () => void;
+
+}
+function FreeChar({user,campaginId,onClick}:freeCharProps){
     
 
     async function getCharSheets():Promise<charSheet[]>{
-        const res = await fetch(`/api/charSheets?userId=${user}`,{
+        const res = await fetch(`/api/freeCharSheets?userId=${user}`,{
             credentials:"include",
             method:"GET"
         })
@@ -155,6 +165,19 @@ function FreeChar(user:UUID){
         }
         return res.json()
     }
+    async function selectSheet(sheetId:UUID){
+        const res=await fetch(`/api/assaignCharSheet`,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                campaginid:campaginId?.id,
+                playerid:user,
+                sheetId:sheetId
+            })
+        })
+    }
     useEffect(()=>{
         getCharSheets()
       .then(sheets=>{
@@ -162,28 +185,35 @@ function FreeChar(user:UUID){
       });
     },[])
     const [sheets,setSheets]=useState<charSheet[]>([])
-    const [toggleForm,setToggleForm]=useState<boolean>(false)
-    const [selectedSheet,setSelectedSheet]=useState<charSheet | undefined>()
-    function handleSheetClick(sheet:charSheet | undefined){
-        console.log("")
-        setToggleForm(true)
-        setSelectedSheet(sheet)
-    }
-    useEffect(()=>{},[toggleForm])
+    const [selectedSheet,setSelectedSheet]=useState<charSheet>()
+    const [toggle,setToggle]=useState<boolean>(true)
+    
+    // function handleSheetClick(sheet:charSheet){
+    //     setToggleForm(true)
+    //     setSelectedSheet(sheet)
 
+    // }
+    useEffect(()=>{
+        if(selectedSheet){
+            selectSheet(selectedSheet.id)
+            setToggle(false);
+            onClick();
+        }
+    },[selectedSheet])
     return(
-        <div>lejaut verovatno
+        <>
+        {toggle &&
+        <div className="lejautVerovatno">
             <div>
-                {sheets.length===0?(<p>Nema nedodeljenih karaktera</p>):(
+                {sheets.length===0?(<p>Nema slobodnih karaktera</p>):(
                     sheets.map((sheet)=>(
-                        <Container id={sheet.id} name={sheet.name} onClick={()=>handleSheetClick(sheet)}></Container>
+                        <Container key={sheet.id}id={sheet.id} name={sheet.name} onClick={()=>setSelectedSheet(sheet)}></Container>
                     ))
                 )}
             </div>
-            {!toggleForm && (<button onClick={()=>handleSheetClick(undefined)}>Napravi novog karaktera, najverovatnije charSheet forma</button>)}
-                {toggleForm && (<div className="ovdeIdeTailwind">
-                    <CharSheetForm char={selectedSheet}></CharSheetForm>
-                </div>)}
+
         </div>
+        }
+        </>
     )
 }
