@@ -93,7 +93,6 @@ app.prepare().then(() => {
         //      - verifikuje se da li sme da joj bude prikljucen
         //      - razmena podataka logika
 
-        console.log(socket.id + " connected")
         socket.on("startSession", async (campaignID : UUID, dmID : UUID) => {
             console.log("\n\n==============================")
             console.log("\t> startSession:\n\t\tcampaignID:", campaignID, "\n\t\tdmID: ", dmID)
@@ -212,22 +211,26 @@ app.prepare().then(() => {
             }
             addToRoom(campaignID, uid)
             socket.emit("redirect", "session/"+campaignID)
-            console.log("\twaiting for part 2\n\n")
+            console.log("==============================")
         })
-        socket.on("joinSession2", () => { // BUG
+        socket.on("joinSession2", () => {
+            console.log("\n\n==============================")
+            console.log("\t> join session 2")
             let campaignID = clientRooms.get(uid)!
-            let playerIndex = playerInCampaign(uid, campaignID)
-            console.log("\n\t\tcampaign: " + sessions.get(campaignID)?.name + "\n\t\tplayer: " + sessions.get(campaignID)?.players.at(playerIndex)?.username)
-            sessions.get(campaignID)!.players.at(playerIndex)!.online = true
-            for (let room in rooms) {
-                removePlayerFromSession(playerIndex, room)
-                removeFromRoom(room, uid)
+            if (sessions.get(campaignID)?.gameMaster.id !== uid) {
+                let playerIndex = playerInCampaign(uid, campaignID)
+                console.log("\n\t\tcampaign: " + sessions.get(campaignID)?.name + "\n\t\tplayer: " + sessions.get(campaignID)?.players.at(playerIndex)?.username)
+                sessions.get(campaignID)!.players.at(playerIndex)!.online = true
+                for (let room in rooms) {
+                    removePlayerFromSession(playerIndex, room)
+                    removeFromRoom(room, uid)
+                }
+                console.log("\t> ", sessions.get(campaignID)?.players.at(playerIndex)?.username, " joined ", sessions.get(campaignID)?.name)
+                console.log("\t> players in session:")
+                sessions.get(campaignID)?.players.forEach((player) => {
+                    console.log("\t\t", player.username)
+                })
             }
-            console.log("\t> ", sessions.get(campaignID)?.players.at(playerIndex)?.username, " joined ", sessions.get(campaignID)?.name)
-            console.log("\t> players in session:")
-            sessions.get(campaignID)?.players.forEach((player) => {
-                console.log("\t\t", player.username)
-            })
             emitUpdate(campaignID)
             console.log("==============================")
             console.log("\t\t> update request")
