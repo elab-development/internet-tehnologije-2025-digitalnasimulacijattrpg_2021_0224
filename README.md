@@ -1,5 +1,9 @@
 # TTRPG SIMULATOR
 
+Aplikacija koja omogucava real-time simulaciju tabletop roleplaying igara
+
+Radjena je u NextJS-u (nazalost), sa WebSocket klijent-server arhitekturom i PostgreSQL bazom podataka
+
 ## Priprema
 
 prvo treba magicno skinuti sve dependency-je
@@ -41,4 +45,10 @@ npm run db:seed
 
 ```
 npm run dev
+```
+
+Projekat se moze pokrenuti kao docker container komandom:
+
+```
+sudo docker compose up --build
 ```
