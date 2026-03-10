@@ -70,10 +70,7 @@ export type note = {
 }
 
 let sessions = new Map<UUID, campaign>()
-// btw ovaj DefaultEventsMap ne moze da se importuje i beskonacno ce davati error u kodu...
-// ... kompajlira se bez problema ...
-// ... ako se uradi import kompajliranje fejluje jer DefaultEventMap export ne postoji ...
-let clients = new Map<string, Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>>()
+let clients = new Map<string, Socket>()
 let rooms = new Map<string, Set<string>> // campaignID, uid[]
 let clientRooms = new Map<string, string> // uid, campaignID
 

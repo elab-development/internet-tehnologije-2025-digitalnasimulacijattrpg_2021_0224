@@ -129,23 +129,6 @@ await db.transaction(async (tx) => {
             capmaign: "cccccccc-0000-0000-0000-000000000000",
             player: "aaaaaaaa-0000-0000-0000-000000000000"
         },
-        {
-            capmaign: "00000000-0000-0000-0000-100000000000",
-            player: "00000000-0000-0000-0000-000000000000"
-        },
-        {
-            capmaign: "00000000-0000-0000-0000-500000000000",
-            player: "00000000-0000-0000-0000-000000000003"          
-        },
-        {
-            capmaign: "00000000-0000-0000-0000-600000000000",
-            player: "00000000-0000-0000-0000-000000000003"
-        },
-        {
-            capmaign: "00000000-0000-0000-0000-700000000000",
-            player: "00000000-0000-0000-0000-000000000003"
-        }
-        
     ]).onConflictDoNothing();
 
     await tx.insert(campaignPlayersCharSheetsTable).values([
@@ -177,11 +160,6 @@ await db.transaction(async (tx) => {
             content: "zlokobno kujem svoje zle planove...",
             writtenIn: "bbbbbbbb-0000-0000-0000-000000000004",
         },
-        {
-            campaign:"00000000-0000-0000-0000-400000000000",
-            player:"00000000-0000-0000-0000-000000000003",
-            charSheet:"00000000-0000-0000-0000-00000000000c"
-        }
     ]).onConflictDoNothing();
 
     // eeeeeeee za dokumenta

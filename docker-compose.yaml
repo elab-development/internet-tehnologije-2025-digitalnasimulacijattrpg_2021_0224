@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:17
+    container_name: ttrpg-simulator
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ttrpgs
+    ports:
+      - "5432:5432"
+    volumes:
+      - ttrpgs_db:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ttrpgs
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@db:5432/ttrpgs"
+      API_URL: "http://localhost:3000"
+      JWT_SECRET: "budjos4ur13"
+      JWT_EXPIRES: "7d"
+    command: sh -c "npx drizzle-kit generate && npx drizzle-kit push && npm run db:seed && npm run dev"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - next_cache:/app/.next
+
+volumes:
+  ttrpgs_db:
+  node_modules:
+  next_cache:
