@@ -26,12 +26,14 @@ export function NavBar() {
                 <div className="flex flex-row justify-between gap-2">
                     <NavbarLink link="/" tekst="welcome"/>
                     <NavbarLink link="/about/" tekst="about"/>
+                    <NavbarLink link="/google-maps/" tekst="map"/>
                 </div>
                 }
                 { status === "authenticated" &&
                 <div className="flex flex-row justify-between gap-2">
                     <NavbarLink link="/home/" tekst="home"/>
                     <NavbarLink link="/about/" tekst="about"/>
+                    <NavbarLink link="/google-maps/" tekst="map"/>
                 </div>
                 }
             </div>

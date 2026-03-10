@@ -12,6 +12,7 @@
     "db:seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
+    "@vis.gl/react-google-maps": "^1.7.1",
     "bcrypt": "^6.0.0",
     "csrf": "^3.1.0",
     "db": "^6.0.3",
