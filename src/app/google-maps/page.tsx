@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+
 import { APIProvider, Map, Marker, InfoWindow } from "@vis.gl/react-google-maps";
+import process from "process";
 
 type MarkerData = {
   position: { lat: number; lng: number };
@@ -45,7 +46,7 @@ const allMarkers = [
   ];
 
   return (
-    <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}>
       {/* Layer toggles */}
       <div
         style={{
