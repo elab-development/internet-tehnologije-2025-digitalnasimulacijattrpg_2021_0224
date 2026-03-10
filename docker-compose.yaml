@@ -29,6 +29,8 @@ services:
       API_URL: "http://localhost:3000"
       JWT_SECRET: "budjos4ur13"
       JWT_EXPIRES: "7d"
+      YOUTUBE_API_KEY: "AIzaSyBayz2GkqKpH4Q1Cbus69iNzxVjy27aCx4"
+      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: "AIzaSyBMAZeT6FKUWwycSF0TzZ2iituVobYTlks"
     command: sh -c "npx drizzle-kit generate && npx drizzle-kit push && npm run db:seed && npm run dev"
     volumes:
       - .:/app
