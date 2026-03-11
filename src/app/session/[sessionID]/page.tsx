@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { SubmitEvent, useEffect, useState } from "react"
 import { useSocket } from "../../components/socketManager"
 import Player from "../../components/session/Player" 
 import { campaign, player } from "../../../../server"
@@ -16,6 +16,7 @@ export default function Session() {
   const [state, setState] = useState<campaign>()
   const [player, setPlayer] = useState<player | null>()
   const [doSkillCheck, setDoSkillCheck] = useState<boolean>(false)
+  const [newNote, setNewNote] = useState<string>('');
 
   useEffect(()=> {
     if (status === 'authenticated' && user && socket) {
@@ -49,6 +50,27 @@ export default function Session() {
     socket?.emit("SkillCheck", p.id, value)
   }
 
+  const handleAddNote = async (e: SubmitEvent) => {
+    e.preventDefault()
+    const res = await fetch('/api/add-note/', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        newNote,
+        player
+      })
+    })
+    if (res.ok) {
+      // update state
+      socket?.emit("updateNotes")
+    } else {
+      // handle
+    }
+  }
+
   return (
     <div className="page flex flex-col h-screen w-screen fixed">
       <NavBar />
@@ -66,20 +88,23 @@ export default function Session() {
             ))}
           </div>
         </div>
+        {player !== null &&
         <div className="right border-l flex flex-col justify-between w-1/4">
           <div className="notes flex flex-col gap-1 bg-black p-1 border">
             <p className="font-bold text-center border">notes</p>
             {player?.charSheet.notes.map((note) => (
               <NoteDisplay key={note.id} n={note}/>
             ))}
-            <button className="btnAddNote border font-bold
-              hover:text-pink-500
-              active:text-transparent"
-              onClick={()=>{}}>dodaj belesku</button>
+            <form className="flex flex-col gap-1" onSubmit={handleAddNote}>
+              <textarea placeholder="Your note here..." onChange={(e) => setNewNote(e.target.value)} />
+              <button className="btnAddNote border font-bold
+                hover:text-pink-500
+                active:text-transparent"
+                type="submit">dodaj belesku</button>
+            </form>
           </div>
-          {player !== null
-            && <CharSheetDisplay cs={player?.charSheet} />}
-        </div>
+          <CharSheetDisplay cs={player?.charSheet} />
+        </div>}
       </div>
     </div>
   )
